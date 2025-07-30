@@ -6,6 +6,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 import os
 import sys
+import logging
 
 # 添加 utils 路徑
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'utils'))
@@ -14,6 +15,12 @@ from taiwan_lottery_crawler import TaiwanLotteryCrawler
 from prediction_algorithm import LotteryPredictor
 
 lottery_bp = Blueprint('lottery', __name__)
+
+# Log Format 設定
+logging.basicConfig(
+    format="[%(asctime)s][%(name)-5s][%(levelname)-5s] %(message)s (%(filename)s:%(lineno)d)",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 # Google Sheets 設定
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
@@ -27,7 +34,7 @@ def get_google_sheets_client():
         client = gspread.authorize(credentials)
         return client
     except Exception as e:
-        print(f"Google Sheets 認證失敗: {e}")
+        logging.critical(f"Google Sheets 認證失敗: {e}")
         return None
 
 def crawl_lottery_data(periods=10):
@@ -37,7 +44,7 @@ def crawl_lottery_data(periods=10):
         lottery_data = crawler.get_lotto649_data(periods)
         return lottery_data
     except Exception as e:
-        print(f"爬取資料失敗: {e}")
+        logging.error(f"爬取資料失敗: {e}")
         return []
 
 def predict_numbers(historical_data, method='hybrid'):
@@ -47,7 +54,7 @@ def predict_numbers(historical_data, method='hybrid'):
         prediction = predictor.predict_numbers(historical_data, method)
         return prediction
     except Exception as e:
-        print(f"預測失敗: {e}")
+        logging.warning(f"預測失敗: {e}")
         return None
 
 def save_to_google_sheets(data, sheet_name, worksheet_name):
@@ -105,7 +112,7 @@ def save_to_google_sheets(data, sheet_name, worksheet_name):
         
         return True
     except Exception as e:
-        print(f"儲存到 Google Sheets 失敗: {e}")
+        logging.error(f"儲存到 Google Sheets 失敗: {e}")
         return False
 
 @lottery_bp.route('/crawl', methods=['POST'])

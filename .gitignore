@@ -58,3 +58,5 @@ google_service_account_example.json
 # Screenshots
 screenshots/
 
+# Batch
+*.bat
