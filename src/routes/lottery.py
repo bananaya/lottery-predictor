@@ -69,17 +69,17 @@ def save_to_google_sheets(data, sheet_name, worksheet_name):
         try:
             sheet = client.open(sheet_name)
             logging.info(f"Open {sheet_name} sheet successfully.")
-        except gspread.SpreadsheetNotFound:
+        except gspread.SpreadsheetNotFound:            
+            logging.warning(f"Sheet Not Found: But creating {sheet_name} sheet ...")
             sheet = client.create(sheet_name)
-            logging.warning(f"Sheet Not Found: But create {sheet_name} sheet successfully.")
         
         # 開啟或建立工作表
         try:
             worksheet = sheet.worksheet(worksheet_name)
             logging.info(f"Open {worksheet_name} worksheet successfully.")
         except gspread.WorksheetNotFound:
+            logging.warning(f"Worksheet Not Found: But creating {worksheet_name} worksheet ...")
             worksheet = sheet.add_worksheet(title=worksheet_name, rows="1000", cols="20")
-            logging.warning(f"Worksheet Not Found: But create {worksheet_name} worksheet successfully.")
         
         # 如果是歷史資料
         if isinstance(data, list) and len(data) > 0 and 'period' in data[0]:
