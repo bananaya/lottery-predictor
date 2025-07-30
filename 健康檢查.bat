@@ -1,1 +1,0 @@
-curl -X GET https://lotto-api-wslg.onrender.com/api/lottery/health
