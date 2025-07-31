@@ -178,7 +178,7 @@ class LotteryPredictor:
         
         # 混合信心度
         confidence = (freq_result['confidence'] + pattern_result['confidence']) / 2
-        # confidence = min(confidence * 1.1, 0.95)  # 混合方法略微提升信心度
+        confidence = min(confidence * 1.1, 1.0)  # 混合方法略微提升信心度
         
         return {
             'predicted_numbers': sorted(predicted_numbers),
