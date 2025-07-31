@@ -63,10 +63,12 @@ def predict_numbers_from_sheets(sheet_name, periods=20, method='hybrid', min_con
             predictor = LotteryPredictor()
             prediction = predictor.predict_numbers(historical_data, method)
             
-            counter = counter + 1
+            counter = counter + 1        
             if prediction and prediction.get('confidence', 0) >= min_confidence:
+                print(f"總共預測 {counter} 次產生號碼。")
                 break
-            if counter > 20:
+            if counter > 500:
+                print(f"預測 {counter} 後沒有產生號碼。"")
                 break
         
         if prediction and prediction.get('confidence', 0) >= min_confidence:
