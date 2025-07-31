@@ -68,14 +68,17 @@ def predict_numbers_from_sheets(sheet_name, periods=20, method='hybrid', min_con
         # 進行預測
         predictor = LotteryPredictor()    
         counter = 0
+        highestConfidence = 0
         while True:
             prediction = predictor.predict_numbers(historical_data, method)
             
-            counter = counter + 1        
+            counter = counter + 1 
+            if highestConfidence < prediction.get('confidence', 0):
+                highestConfidence = prediction.get('confidence', 0)
             if prediction and prediction.get('confidence', 0) >= min_confidence:
                 logging.info(f"總共預測 {counter} 次產生號碼。")
                 break
-            if counter > 500:
+            if counter > 1000:
                 logging.warning(f"預測 {counter} 後沒有產生號碼。")
                 break
         
@@ -84,7 +87,7 @@ def predict_numbers_from_sheets(sheet_name, periods=20, method='hybrid', min_con
             sheets_manager.save_prediction_result(sheet_name, prediction)
             return prediction
         else:
-            logging.warning(f"預測信心度 {prediction.get('confidence', 0):.3f} 低於最低要求 {min_confidence}")
+            logging.warning(f"預測信心度最高為 {highestConfidence:.3f} 低於最低要求 {min_confidence}")
             return None
             
     except Exception as e:
