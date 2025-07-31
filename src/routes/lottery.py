@@ -4,9 +4,16 @@ import json
 from datetime import datetime
 import os
 import sys
+import logging
 
 # 添加 utils 路徑
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'utils'))
+
+# 設定 logging 格式
+logging.basicConfig(
+    format="[%(asctime)s][%(name)-5s][%(levelname)-5s] %(message)s (%(filename)s:%(lineno)d)",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 from taiwan_lottery_crawler import TaiwanLotteryCrawler
 from prediction_algorithm import LotteryPredictor
@@ -20,7 +27,7 @@ def get_google_sheets_manager():
         manager = GoogleSheetsManager()
         return manager
     except Exception as e:
-        print(f"Google Sheets 管理器初始化失敗: {e}")
+        logging.critical(f"Google Sheets 管理器初始化失敗: {e}")
         return None
 
 def crawl_lottery_data(periods=10):
@@ -30,7 +37,7 @@ def crawl_lottery_data(periods=10):
         lottery_data = crawler.get_lotto649_data(periods)
         return lottery_data
     except Exception as e:
-        print(f"爬取資料失敗: {e}")
+        logging.error(f"爬取資料失敗: {e}")
         return []
 
 def predict_numbers_from_sheets(sheet_name, periods=20, method='hybrid', min_confidence=0.7):
@@ -45,7 +52,7 @@ def predict_numbers_from_sheets(sheet_name, periods=20, method='hybrid', min_con
         historical_data = sheets_manager.read_historical_data(sheet_name)
         
         if not historical_data:
-            print("Google Sheets 中沒有歷史資料，嘗試爬取新資料")
+            logging.info("Google Sheets 中沒有歷史資料，嘗試爬取新資料")
             # 如果沒有資料，先爬取一些資料
             crawled_data = crawl_lottery_data(periods)
             if crawled_data:
@@ -59,16 +66,16 @@ def predict_numbers_from_sheets(sheet_name, periods=20, method='hybrid', min_con
             historical_data = historical_data[-periods:]
         
         # 進行預測
+        predictor = LotteryPredictor()        
         while True:
-            predictor = LotteryPredictor()
             prediction = predictor.predict_numbers(historical_data, method)
             
             counter = counter + 1        
             if prediction and prediction.get('confidence', 0) >= min_confidence:
-                print(f"總共預測 {counter} 次產生號碼。")
+                logging.info(f"總共預測 {counter} 次產生號碼。")
                 break
             if counter > 500:
-                print(f"預測 {counter} 後沒有產生號碼。")
+                logging.warning(f"預測 {counter} 後沒有產生號碼。")
                 break
         
         if prediction and prediction.get('confidence', 0) >= min_confidence:
@@ -76,11 +83,11 @@ def predict_numbers_from_sheets(sheet_name, periods=20, method='hybrid', min_con
             sheets_manager.save_prediction_result(sheet_name, prediction)
             return prediction
         else:
-            print(f"預測信心度 {prediction.get('confidence', 0):.3f} 低於最低要求 {min_confidence}")
+            logging.warning(f"預測信心度 {prediction.get('confidence', 0):.3f} 低於最低要求 {min_confidence}")
             return None
             
     except Exception as e:
-        print(f"從 Google Sheets 預測失敗: {e}")
+        logging.error(f"從 Google Sheets 預測失敗: {e}")
         return None
 
 @lottery_bp.route('/health', methods=['GET'])
