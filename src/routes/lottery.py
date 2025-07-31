@@ -59,8 +59,15 @@ def predict_numbers_from_sheets(sheet_name, periods=20, method='hybrid', min_con
             historical_data = historical_data[-periods:]
         
         # 進行預測
-        predictor = LotteryPredictor()
-        prediction = predictor.predict_numbers(historical_data, method)
+        while True:
+            predictor = LotteryPredictor()
+            prediction = predictor.predict_numbers(historical_data, method)
+            
+            counter = counter + 1
+            if prediction and prediction.get('confidence', 0) >= min_confidence:
+                break
+            if counter > 20
+                break
         
         if prediction and prediction.get('confidence', 0) >= min_confidence:
             # 儲存預測結果到 Google Sheets
