@@ -5,10 +5,25 @@
 ## 主要功能
 
 1. **歷史資料爬取**：從台灣彩券網站爬取大樂透歷史開獎資料
-2. **Google Sheets 整合**：將資料自動儲存到 Google Sheets
-3. **AI 預測演算法**：基於歷史資料進行號碼預測
-4. **RESTful API**：提供完整的 API 介面
-5. **網頁介面**：直觀的前端操作介面
+2. **Google Sheets 整合**：將資料自動儲存到 Google Sheets，優先使用 Sheets 中的資料
+3. **AI 預測演算法**：基於歷史資料進行號碼預測，支援四種演算法
+4. **信心度閾值控制**：只顯示達到設定信心度的預測結果（50%-95%）
+5. **RESTful API**：提供完整的 API 介面
+6. **響應式網頁介面**：支援桌面和行動裝置的直觀操作介面
+
+## 🎯 預測演算法
+
+- **頻率分析**：基於號碼出現頻率的統計分析
+- **模式識別**：識別號碼間的關聯模式
+- **混合演算法**：結合多種方法的綜合預測（推薦）
+- **機器學習**：使用機器學習模型進行預測
+
+## 🔧 信心度控制
+
+系統會計算每次預測的信心度，只有達到設定閾值的預測才會顯示：
+- 預設最低信心度：70%
+- 可調整範圍：50% - 95%
+- 低於閾值時會提示增加參考期數或降低要求
 
 ## 技術架構
 
@@ -40,13 +55,68 @@ POST /api/lottery/predict
 ```json
 {
   "periods": 20,
-  "sheet_name": "大樂透資料"
+  "sheet_name": "大樂透資料",
+  "min_confidence": 0.7,
+  "method": "hybrid"
+}
+```
+**參數說明：**
+- `periods`: 參考期數（5-100）
+- `sheet_name`: Google Sheets 試算表名稱
+- `min_confidence`: 最低信心度（0.5-0.95）
+- `method`: 預測方法（frequency/pattern/hybrid/ml）
+
+**回應範例：**
+```json
+{
+  "message": "預測完成",
+  "prediction": {
+    "predicted_numbers": [8, 16, 26, 34, 38, 41],
+    "predicted_special": 48,
+    "confidence": 0.773,
+    "prediction_date": "2025-07-30 05:41:13"
+  },
+  "historical_data_count": 20,
+  "method_used": "hybrid",
+  "min_confidence_required": 0.7,
+  "actual_confidence": 0.773
 }
 ```
 
 ### 3. 取得歷史資料
 ```
-GET /api/lottery/history?periods=20
+GET /api/lottery/history?periods=20&sheet_name=大樂透資料
+```
+**參數說明：**
+- `periods`: 取得期數（預設 10）
+- `sheet_name`: Google Sheets 試算表名稱（預設 "大樂透資料"）
+
+**回應範例：**
+```json
+{
+  "message": "取得 20 期歷史資料",
+  "data": [
+    {
+      "period": "114000001",
+      "date": "2025-01-02",
+      "numbers": [5, 12, 18, 25, 33, 41],
+      "special_number": 7,
+      "game_type": "大樂透"
+    }
+  ]
+}
+```
+
+### 4. 系統健康檢查
+```
+GET /api/lottery/health
+```
+**回應範例：**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-07-30 05:40:39"
+}
 ```
 
 ### 4. 健康檢查

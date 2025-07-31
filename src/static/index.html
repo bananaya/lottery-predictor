@@ -200,16 +200,31 @@
             </div>
             
             <div class="section">
-                <h2>📊 資料設定</h2>
-                <div class="form-group">
+                <h2>📊 資料設                <div class="form-group">
                     <label for="periods">參考期數：</label>
                     <input type="number" id="periods" value="20" min="5" max="100">
                 </div>
+                
                 <div class="form-group">
                     <label for="sheetName">Google Sheets 名稱：</label>
-                    <input type="text" id="sheetName" value="大樂透預測資料" placeholder="請輸入試算表名稱">
+                    <input type="text" id="sheetName" placeholder="請輸入試算表名稱" value="大樂透資料">
                 </div>
-                <button class="btn" onclick="crawlData()">📥 爬取歷史資料</button>
+                
+                <div class="form-group">
+                    <label for="minConfidence">最低信心度：</label>
+                    <input type="range" id="minConfidence" min="0.5" max="0.95" step="0.05" value="0.7">
+                    <span id="confidenceValue">70%</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="predictionMethod">預測方法：</label>
+                    <select id="predictionMethod">
+                        <option value="hybrid">混合演算法（推薦）</option>
+                        <option value="frequency">頻率分析</option>
+                        <option value="pattern">模式識別</option>
+                        <option value="ml">機器學習</option>
+                    </select>
+                </div>         <button class="btn" onclick="crawlData()">📥 爬取歷史資料</button>
                 <button class="btn" onclick="getHistory()">📋 查看歷史資料</button>
             </div>
             
@@ -230,6 +245,18 @@
 
     <script>
         const API_BASE = '/api/lottery';
+        
+        // 初始化信心度滑桿
+        document.addEventListener('DOMContentLoaded', function() {
+            const confidenceSlider = document.getElementById('minConfidence');
+            const confidenceValue = document.getElementById('confidenceValue');
+            
+            // 更新信心度顯示
+            confidenceSlider.addEventListener('input', function() {
+                const value = (this.value * 100).toFixed(0);
+                confidenceValue.textContent = value + '%';
+            });
+        });
         
         function showLoading() {
             document.getElementById('loading').style.display = 'block';
@@ -301,6 +328,8 @@
         async function predictNumbers() {
             const periods = document.getElementById('periods').value;
             const sheetName = document.getElementById('sheetName').value;
+            const minConfidence = document.getElementById('minConfidence').value;
+            const method = document.getElementById('predictionMethod').value;
             
             if (!periods || !sheetName) {
                 showResult('請填寫所有必要欄位', false);
@@ -317,16 +346,39 @@
                     },
                     body: JSON.stringify({
                         periods: parseInt(periods),
-                        sheet_name: sheetName
+                        sheet_name: sheetName,
+                        min_confidence: parseFloat(minConfidence),
+                        method: method
                     })
                 });
                 
                 const data = await response.json();
                 
                 if (response.ok) {
-                    showResult(`🎉 ${data.message}`, true, data.prediction);
+                    // 顯示詳細的預測結果
+                    const prediction = data.prediction;
+                    const confidence = (prediction.confidence * 100).toFixed(1);
+                    const minRequired = (data.min_confidence_required * 100).toFixed(0);
+                    
+                    let resultHtml = `
+                        <div class="prediction-result">
+                            <h3>🎯 預測完成</h3>
+                            <div class="prediction-info">
+                                <p><strong>預測方法：</strong> ${data.method_used}</p>
+                                <p><strong>參考資料：</strong> ${data.historical_data_count} 期</p>
+                                <p><strong>信心度：</strong> ${confidence}% (要求: ${minRequired}%)</p>
+                                <p><strong>預測時間：</strong> ${prediction.prediction_date}</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    showResult(resultHtml, true, prediction);
                 } else {
-                    showResult(`❌ 錯誤：${data.error}`, false);
+                    let errorMsg = `❌ 錯誤：${data.error}`;
+                    if (data.message) {
+                        errorMsg += `<br>💡 建議：${data.message}`;
+                    }
+                    showResult(errorMsg, false);
                 }
             } catch (error) {
                 showResult(`❌ 網路錯誤：${error.message}`, false);
