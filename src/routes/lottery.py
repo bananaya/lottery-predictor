@@ -66,7 +66,7 @@ def predict_numbers_from_sheets(sheet_name, periods=20, method='hybrid', min_con
             counter = counter + 1
             if prediction and prediction.get('confidence', 0) >= min_confidence:
                 break
-            if counter > 20
+            if counter > 20:
                 break
         
         if prediction and prediction.get('confidence', 0) >= min_confidence:
