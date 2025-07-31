@@ -66,7 +66,8 @@ def predict_numbers_from_sheets(sheet_name, periods=20, method='hybrid', min_con
             historical_data = historical_data[-periods:]
         
         # 進行預測
-        predictor = LotteryPredictor()        
+        predictor = LotteryPredictor()    
+        counter = 0
         while True:
             prediction = predictor.predict_numbers(historical_data, method)
             
