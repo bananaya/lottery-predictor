@@ -76,15 +76,33 @@ class TaiwanLotteryCrawlerClass:
     # === 3. 彩券欄位對應 ===
     @staticmethod
     def extract_lotto649(draw, date_str):
-        return [draw.get('期別'), date_str] + draw.get('獎號') + [draw.get('特別號'), '大樂透']
+        return {
+            "period": draw.get('期別'),
+            "date": date_str,
+            "numbers": draw.get('獎號'),
+            "special_number": draw.get('特別號'),
+            "game_type": "大樂透"
+        }
 
     @staticmethod
     def extract_daily539(draw, date_str):
-        return [draw.get('期別'), date_str] + draw.get('獎號') + ['今彩539']
+        return {
+            "period": draw.get('期別'),
+            "date": date_str,
+            "numbers": draw.get('獎號'),
+            "special_number": None,
+            "game_type": "今彩539"
+        }
 
     @staticmethod
     def extract_powerlotto(draw, date_str):
-        return [draw.get('期別'), date_str] + draw.get('第一區') + [draw.get('第二區') + '威力彩']
+        return {
+            "period": draw.get('期別'),
+            "date": date_str,
+            "numbers": draw.get('第一區'),
+            "special_number": draw.get('第二區'),
+            "game_type": "威力彩"
+        }
 
 
     # fetch_and_write("lotto649", "大樂透", extract_lotto649)
