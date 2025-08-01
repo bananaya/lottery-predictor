@@ -15,7 +15,7 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
-from taiwan_lottery_crawler import TaiwanLotteryCrawler
+from taiwan_lottery_crawler import TaiwanLotteryCrawlerClass
 from prediction_algorithm import LotteryPredictor
 from google_sheets_manager import GoogleSheetsManager
 
@@ -33,8 +33,8 @@ def get_google_sheets_manager():
 def crawl_lottery_data(periods=10):
     """爬取大樂透歷史資料"""
     try:
-        crawler = TaiwanLotteryCrawler()
-        lottery_data = crawler.get_lotto649_data(periods)
+        crawler = TaiwanLotteryCrawlerClass()
+        lottery_data = crawler.get_lotto_data("lotto649", extract_lotto649, periods)
         return lottery_data
     except Exception as e:
         logging.error(f"爬取資料失敗: {e}")
