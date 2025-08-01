@@ -162,11 +162,11 @@ def predict_numbers_from_sheets(sheet_name, periods=20, method='hybrid', min_con
             "prediction_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "predicted_numbers": sorted(best_main_numbers),
             "predicted_special": best_special,
-            "confidence": 0.0,
-            "strategy": f"top-frequency-from-{total_predictions}-predictions"
-        }
-        
-        
+            "confidence": highestConfidence,
+            "strategy": f"top-frequency-from-{total_predictions}-predictions",
+            "method_used": method,
+            "min_confidence_required": min_confidence
+        }   
         sheets_manager.save_prediction_result(sheet_name, best_prediction)
         
         logging.info(f"成功從 {total_predictions} 組預測中統計出最佳號碼")
