@@ -21,56 +21,51 @@ class TaiwanLotteryCrawlerClass:
         })
 
     # === 2. 抓取與寫入 ===
-    def get_lotto_data(self, game_key, extract_func, max_draws=50):   
-        try:             
-            now = datetime.now()
-            start_year = 2004            
-            
-            existing_dates = set()
-            lottery_datas = []
-            draw_count = 0
+    def get_lotto_data(self, game_key, extract_func, max_draws=50):           
+        now = datetime.now()
+        start_year = 2004            
+        
+        existing_dates = set()
+        lottery_datas = []
+        draw_count = 0
 
-            for year in range(now.year, start_year - 1, -1):
-                for month in range(12, 0, -1):
-                    if year == now.year and month > now.month:
+        for year in range(now.year, start_year - 1, -1):
+            for month in range(12, 0, -1):
+                if year == now.year and month > now.month:
+                    continue
+                try:
+                    results = getattr(crawler, game_key)([str(year), f"{month:02d}"])
+                except Exception as e:
+                    logger.warning(f"⚠️ 抓取失敗 {game_key} {year}/{month:02d}：{e}")
+                    continue
+                for draw in sorted(results, key=lambda x: x.get('開獎日期'), reverse=True):
+                    date_str = draw.get('開獎日期')
+                    if not date_str:
                         continue
                     try:
-                        results = getattr(crawler, game_key)([str(year), f"{month:02d}"])
-                    except Exception as e:
-                        logger.warning(f"⚠️ 抓取失敗 {game_key} {year}/{month:02d}：{e}")
+                        draw_date = datetime.strptime(date_str[:10], "%Y-%m-%d")
+                        date_str = draw_date.strftime("%Y/%m/%d")
+                    except Exception:
                         continue
-                    for draw in sorted(results, key=lambda x: x.get('開獎日期'), reverse=True):
-                        date_str = draw.get('開獎日期')
-                        if not date_str:
-                            continue
-                        try:
-                            draw_date = datetime.strptime(date_str[:10], "%Y-%m-%d")
-                            date_str = draw_date.strftime("%Y/%m/%d")
-                        except Exception:
-                            continue
-                        if draw_date > now or date_str in existing_dates:
-                            continue
-                        lottery_data = extract_func(draw, date_str)
-                        if lottery_data:
-                            lottery_datas.append(lottery_data)
-                            existing_dates.add(date_str)
-                            draw_count += 1
-                        if draw_count >= max_draws:
-                            break
+                    if draw_date > now or date_str in existing_dates:
+                        continue
+                    lottery_data = extract_func(draw, date_str)
+                    if lottery_data:
+                        lottery_datas.append(lottery_data)
+                        existing_dates.add(date_str)
+                        draw_count += 1
                     if draw_count >= max_draws:
                         break
                 if draw_count >= max_draws:
                     break
+            if draw_count >= max_draws:
+                break
 
-            if lottery_datas:                
-                logger.info(f"✅ {game_key} 寫入 {len(lottery_datas)} 筆")
-                return lottery_datas
-            else:            
-                logger.warning(f"⚠️ {game_key} 沒有新資料")
-                return []
-                
-        except Exception as e:
-            print(f"爬取{game_key}資料失敗: {e}")
+        if lottery_datas:                
+            logger.info(f"✅ {game_key} 寫入 {len(lottery_datas)} 筆")
+            return lottery_datas
+        else:            
+            logger.warning(f"⚠️ {game_key} 沒有新資料")
             return []
 
     # === 3. 彩券欄位對應 ===
