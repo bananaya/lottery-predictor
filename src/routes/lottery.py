@@ -96,6 +96,8 @@ def crawl_lottery_data(periods=10):
         
 def predict_numbers_from_sheets(sheet_name, periods=20, method='hybrid', min_confidence=0.7, total_predictions=5):
     """從 Google Sheets 讀取資料並進行預測"""
+    from collections import Counter
+    
     try:
         # 取得 Google Sheets 管理器
         sheets_manager = get_google_sheets_manager()
@@ -138,14 +140,36 @@ def predict_numbers_from_sheets(sheet_name, periods=20, method='hybrid', min_con
                     break
             
             if attempts == max_attempts:
-                logging.warning(f"達到重高重試次數{max_attempts}，預測信心度最高為 {highestConfidence:.3f} 低於最低要求 {min_confidence}")
+                logging.warning(f"達到最高重試次數{max_attempts}，預測信心度最高為 {highestConfidence:.3f} 低於最低要求 {min_confidence}")
                 return None, []
             
-        # 選出最佳預測（信心度最高）
-        best_prediction = max(predictions, key=lambda x: x.get('confidence', 0))
+        # 統計號碼出現次數
+        main_number_counter = Counter()
+        special_number_counter = Counter()
+
+        for pred in predictions:
+            main_number_counter.update(pred.get("predicted_numbers", []))
+            special = pred.get("predicted_special")
+            if special is not None:
+                special_number_counter[special] += 1
+
+        # 最常出現的 6 個主號
+        best_main_numbers = [num for num, _ in main_number_counter.most_common(6)]
+        best_special = special_number_counter.most_common(1)[0][0] if special_number_counter else None
+        
+        # 建立最佳預測組合
+        best_prediction = {
+            "prediction_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "predicted_numbers": sorted(best_main_numbers),
+            "predicted_special": best_special,
+            "confidence": 0.0,
+            "strategy": f"top-frequency-from-{total_predictions}-predictions"
+        }
+        
+        
         sheets_manager.save_prediction_result(sheet_name, best_prediction)
         
-        logging.info(f"總共預測 {attempts} 次，取得 {len(predictions)} 組有效預測")
+        logging.info(f"成功從 {total_predictions} 組預測中統計出最佳號碼")
         return best_prediction, predictions
 
     except Exception as e:
