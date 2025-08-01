@@ -230,10 +230,6 @@
             
             <div class="section">
                 <h2>🔮 號碼預測</h2>
-				<div class="form-group">
-					<label for="totalPredictions">預測組數：</label>
-					<input type="number" id="totalPredictions" value="50" min="1" max="200">
-				</div>
                 <button class="btn" onclick="predictNumbers()">🎯 預測下一期號碼</button>
                 <button class="btn" onclick="healthCheck()">❤️ 系統健康檢查</button>
             </div>
@@ -334,9 +330,8 @@
             const sheetName = document.getElementById('sheetName').value;
             const minConfidence = document.getElementById('minConfidence').value;
             const method = document.getElementById('predictionMethod').value;
-			const totalPredictions = document.getElementById('totalPredictions').value;
             
-            if (!periods || !sheetName || !totalPredictions) {
+            if (!periods || !sheetName) {
                 showResult('請填寫所有必要欄位', false);
                 return;
             }
@@ -353,8 +348,7 @@
                         periods: parseInt(periods),
                         sheet_name: sheetName,
                         min_confidence: parseFloat(minConfidence),
-                        method: method,
-						total_predictions: parseInt(totalPredictions)
+                        method: method
                     })
                 });
                 
@@ -362,7 +356,7 @@
                 
                 if (response.ok) {
                     // 顯示詳細的預測結果
-                    const prediction = data.best_prediction;
+                    const prediction = data.prediction;
                     const confidence = (prediction.confidence * 100).toFixed(1);
                     const minRequired = (data.min_confidence_required * 100).toFixed(0);
                     
