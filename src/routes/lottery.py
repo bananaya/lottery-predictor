@@ -126,10 +126,10 @@ def predict_numbers_from_sheets(sheet_name, periods=20, method='hybrid', min_con
         predictions = []        
         max_attempts = 500
         counter = 0
-        highestConfidence = 0
         
         while len(predictions) < total_predictions:
             attempts = 0
+            highestConfidence = 0
             while attempts < max_attempts:
                 attempts += 1
                 prediction = predictor.predict_numbers(historical_data, method)
@@ -140,7 +140,7 @@ def predict_numbers_from_sheets(sheet_name, periods=20, method='hybrid', min_con
                     break
             
             if attempts == max_attempts:
-                logging.warning(f"達到最高重試次數{max_attempts}，預測信心度最高為 {highestConfidence:.3f} 低於最低要求 {min_confidence}")
+                logging.warning(f"第 {len(predictions)+1} 預測，信心度最高為 {highestConfidence:.3f} 低於最低要求 {min_confidence}")
                 return None, []
             
         # 統計號碼出現次數
