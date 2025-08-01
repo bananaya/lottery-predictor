@@ -35,7 +35,7 @@ class TaiwanLotteryCrawlerClass:
                 if year == now.year and month > now.month:
                     continue
                 try:
-                    results = getattr(crawler, game_key)([str(year), f"{month:02d}"])
+                    results = getattr(self.crawler, game_key)([str(year), f"{month:02d}"])
                 except Exception as e:
                     logging.warning(f"⚠️ 抓取失敗 {game_key} {year}/{month:02d}：{e}")
                     continue
