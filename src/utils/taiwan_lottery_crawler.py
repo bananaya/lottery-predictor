@@ -70,21 +70,7 @@ class TaiwanLotteryCrawlerClass:
                 
         except Exception as e:
             print(f"爬取{game_key}資料失敗: {e}")
-            return []
-
-    # === 3. 彩券欄位對應 ===
-    @staticmethod
-    def extract_lotto649(draw, date_str):
-        return [date_str, draw.get('期別')] + draw.get('獎號') + [draw.get('特別號')]
-
-    @staticmethod
-    def extract_daily539(draw, date_str):
-        return ['今彩539', date_str, draw.get('期別')] + draw.get('獎號')
-
-    @staticmethod
-    def extract_powerlotto(draw, date_str):
-        return ['威力彩', date_str, draw.get('期別')] + draw.get('第一區') + [draw.get('第二區')]        
-
+            return []     
 
     # fetch_and_write("lotto649", "大樂透", extract_lotto649)
     # fetch_and_write("daily_cash", "今彩539", extract_daily539)

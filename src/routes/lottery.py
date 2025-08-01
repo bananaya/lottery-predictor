@@ -30,11 +30,22 @@ def get_google_sheets_manager():
         logging.critical(f"Google Sheets 管理器初始化失敗: {e}")
         return None
 
+
+# === 3. 彩券欄位對應 ===
+def extract_lotto649(draw, date_str):
+    return [date_str, draw.get('期別')] + draw.get('獎號') + [draw.get('特別號')]
+
+def extract_daily539(draw, date_str):
+    return ['今彩539', date_str, draw.get('期別')] + draw.get('獎號')
+
+def extract_powerlotto(draw, date_str):
+    return ['威力彩', date_str, draw.get('期別')] + draw.get('第一區') + [draw.get('第二區')]  
+
 def crawl_lottery_data(periods=10):
     """爬取大樂透歷史資料"""
     try:
         crawler = TaiwanLotteryCrawlerClass()
-        lottery_data = crawler.get_lotto_data("lotto649", crawler.extract_lotto649, periods)
+        lottery_data = crawler.get_lotto_data("lotto649", extract_lotto649, periods)
         return lottery_data
     except Exception as e:
         logging.error(f"爬取資料失敗: {e}")
