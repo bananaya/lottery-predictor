@@ -34,7 +34,7 @@ def crawl_lottery_data(periods=10):
     """爬取大樂透歷史資料"""
     try:
         crawler = TaiwanLotteryCrawlerClass()
-        lottery_data = crawler.get_lotto_data("lotto649", extract_lotto649, periods)
+        lottery_data = crawler.get_lotto_data("lotto649", crawler.extract_lotto649, periods)
         return lottery_data
     except Exception as e:
         logging.error(f"爬取資料失敗: {e}")
