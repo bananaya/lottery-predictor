@@ -36,7 +36,7 @@ class TaiwanLotteryCrawlerClass:
                 try:
                     results = getattr(crawler, game_key)([str(year), f"{month:02d}"])
                 except Exception as e:
-                    logger.warning(f"⚠️ 抓取失敗 {game_key} {year}/{month:02d}：{e}")
+                    logging.warning(f"⚠️ 抓取失敗 {game_key} {year}/{month:02d}：{e}")
                     continue
                 for draw in sorted(results, key=lambda x: x.get('開獎日期'), reverse=True):
                     date_str = draw.get('開獎日期')
@@ -62,10 +62,10 @@ class TaiwanLotteryCrawlerClass:
                 break
 
         if lottery_datas:                
-            logger.info(f"✅ {game_key} 寫入 {len(lottery_datas)} 筆")
+            logging.info(f"✅ {game_key} 寫入 {len(lottery_datas)} 筆")
             return lottery_datas
         else:            
-            logger.warning(f"⚠️ {game_key} 沒有新資料")
+            logging.warning(f"⚠️ {game_key} 沒有新資料")
             return []
 
     # === 3. 彩券欄位對應 ===
