@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多樂透遊戲預測系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .control-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .slider-container {
+            margin-top: 10px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .confidence-display {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            color: #333;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .results-section {
+            margin-top: 40px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .result-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .numbers-display {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .number-ball {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        .special-ball {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            color: white;
+            border: 3px solid white;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .result-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            text-align: center;
+        }
+
+        .info-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .error {
+            background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .success {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .game-info {
+            background: #e8f4f8;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .game-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .game-info p {
+            color: #666;
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .control-panel {
+                padding: 20px;
+            }
+
+            .numbers-display {
+                gap: 8px;
+            }
+
+            .number-ball {
+                width: 40px;
+                height: 40px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎰 多樂透遊戲預測系統</h1>
+            <p>支援所有台灣彩券樂透遊戲的智能預測</p>
+        </div>
+
+        <div class="main-content">
+            <div class="control-panel">
+                <div class="form-group">
+                    <label for="gameType">選擇樂透遊戲：</label>
+                    <select id="gameType" onchange="updateGameInfo()">
+                        <option value="">請選擇遊戲...</option>
+                    </select>
+                </div>
+
+                <div id="gameInfo" class="game-info" style="display: none;">
+                    <h3 id="gameInfoTitle">遊戲資訊</h3>
+                    <p id="gameInfoDetails"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="sheetName">Google Sheets 名稱：</label>
+                    <input type="text" id="sheetName" placeholder="例如：我的樂透資料" value="樂透資料">
+                </div>
+
+                <div class="form-group">
+                    <label for="periods">參考期數：</label>
+                    <input type="number" id="periods" min="5" max="100" value="20">
+                </div>
+
+                <div class="form-group">
+                    <label for="method">預測方法：</label>
+                    <select id="method">
+                        <option value="hybrid">混合演算法（推薦）</option>
+                        <option value="frequency">頻率分析</option>
+                        <option value="pattern">模式識別</option>
+                        <option value="ml">機器學習</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="confidence">最低信心度：<span id="confidenceValue">70%</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="confidence" class="slider" min="50" max="95" value="70">
+                    </div>
+                    <div class="confidence-display">
+                        當前設定：<span id="confidenceDisplay">70%</span>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="checkHealth()">系統健康檢查</button>
+                    <button class="btn btn-success" onclick="crawlData()">爬取歷史資料</button>
+                    <button class="btn btn-primary" onclick="predictNumbers()">預測下一期號碼</button>
+                    <button class="btn btn-secondary" onclick="viewHistory()">查看歷史資料</button>
+                </div>
+            </div>
+
+            <div id="results" class="results-section"></div>
+        </div>
+    </div>
+
+    <script>
+        let supportedGames = {};
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSupportedGames();
+            
+            // 信心度滑桿事件監聽器
+            const confidenceSlider = document.getElementById('confidence');
+            const confidenceValue = document.getElementById('confidenceValue');
+            const confidenceDisplay = document.getElementById('confidenceDisplay');
+            
+            confidenceSlider.addEventListener('input', function() {
+                const value = this.value + '%';
+                confidenceValue.textContent = value;
+                confidenceDisplay.textContent = value;
+            });
+        });
+
+        // 載入支援的遊戲列表
+        async function loadSupportedGames() {
+            try {
+                const response = await fetch('/api/games');
+                const data = await response.json();
+                
+                if (data.success) {
+                    supportedGames = data.games;
+                    populateGameSelect();
+                } else {
+                    showError('載入遊戲列表失敗：' + data.error);
+                }
+            } catch (error) {
+                showError('載入遊戲列表時發生錯誤：' + error.message);
+            }
+        }
+
+        // 填充遊戲選擇下拉選單
+        function populateGameSelect() {
+            const gameSelect = document.getElementById('gameType');
+            gameSelect.innerHTML = '<option value="">請選擇遊戲...</option>';
+            
+            for (const [gameKey, gameInfo] of Object.entries(supportedGames)) {
+                const option = document.createElement('option');
+                option.value = gameKey;
+                option.textContent = gameInfo.name;
+                gameSelect.appendChild(option);
+            }
+        }
+
+        // 更新遊戲資訊顯示
+        function updateGameInfo() {
+            const gameType = document.getElementById('gameType').value;
+            const gameInfo = document.getElementById('gameInfo');
+            const gameInfoTitle = document.getElementById('gameInfoTitle');
+            const gameInfoDetails = document.getElementById('gameInfoDetails');
+            
+            if (gameType && supportedGames[gameType]) {
+                const game = supportedGames[gameType];
+                gameInfoTitle.textContent = game.name + ' 遊戲資訊';
+                
+                let details = `選號範圍：${game.number_range[0]}-${game.number_range[1]}，選擇 ${game.number_count} 個號碼`;
+                
+                if (game.special_number) {
+                    details += `，特別號範圍：${game.special_range[0]}-${game.special_range[1]}`;
+                }
+                
+                if (game.is_digit_game) {
+                    details += '（數字遊戲，每個位置獨立選擇）';
+                }
+                
+                gameInfoDetails.textContent = details;
+                gameInfo.style.display = 'block';
+            } else {
+                gameInfo.style.display = 'none';
+            }
+        }
+
+        // 系統健康檢查
+        async function checkHealth() {
+            showLoading('正在檢查系統狀態...');
+            
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(`系統狀態：${data.status}<br>
+                               爬蟲模組：${data.modules.crawler}<br>
+                               Google Sheets：${data.modules.google_sheets}<br>
+                               預測模組：${data.modules.predictor}<br>
+                               支援遊戲數：${data.supported_games.length}`);
+                } else {
+                    showError('系統健康檢查失敗：' + data.error);
+                }
+            } catch (error) {
+                showError('系統健康檢查時發生錯誤：' + error.message);
+            }
+        }
+
+        // 爬取歷史資料
+        async function crawlData() {
+            const gameType = document.getElementById('gameType').value;
+            const periods = document.getElementById('periods').value;
+            const sheetName = document.getElementById('sheetName').value;
+            
+            if (!gameType) {
+                showError('請先選擇樂透遊戲');
+                return;
+            }
+            
+            if (!sheetName.trim()) {
+                showError('請輸入 Google Sheets 名稱');
+                return;
+            }
+            
+            showLoading(`正在爬取 ${supportedGames[gameType].name} 最近 ${periods} 期資料...`);
+            
+            try {
+                const response = await fetch('/api/crawl', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        game_type: gameType,
+                        periods: parseInt(periods),
+                        sheet_name: sheetName
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(`${data.message}<br>
+                               遊戲類型：${data.game_type}<br>
+                               資料筆數：${data.data_count}<br>
+                               已儲存至 Google Sheets：${data.saved_to_sheets ? '是' : '否'}`);
+                } else {
+                    showError('爬取資料失敗：' + data.error);
+                }
+            } catch (error) {
+                showError('爬取資料時發生錯誤：' + error.message);
+            }
+        }
+
+        // 預測號碼
+        async function predictNumbers() {
+            const gameType = document.getElementById('gameType').value;
+            const periods = document.getElementById('periods').value;
+            const sheetName = document.getElementById('sheetName').value;
+            const method = document.getElementById('method').value;
+            const confidence = document.getElementById('confidence').value / 100;
+            
+            if (!gameType) {
+                showError('請先選擇樂透遊戲');
+                return;
+            }
+            
+            if (!sheetName.trim()) {
+                showError('請輸入 Google Sheets 名稱');
+                return;
+            }
+            
+            showLoading(`正在預測 ${supportedGames[gameType].name} 下一期號碼...`);
+            
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        game_type: gameType,
+                        periods: parseInt(periods),
+                        sheet_name: sheetName,
+                        method: method,
+                        min_confidence: confidence
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayPredictionResult(data);
+                } else {
+                    showError('預測失敗：' + data.error + 
+                             (data.suggestion ? '<br>建議：' + data.suggestion : ''));
+                }
+            } catch (error) {
+                showError('預測時發生錯誤：' + error.message);
+            }
+        }
+
+        // 查看歷史資料
+        async function viewHistory() {
+            const gameType = document.getElementById('gameType').value;
+            const periods = document.getElementById('periods').value;
+            const sheetName = document.getElementById('sheetName').value;
+            
+            if (!gameType) {
+                showError('請先選擇樂透遊戲');
+                return;
+            }
+            
+            if (!sheetName.trim()) {
+                showError('請輸入 Google Sheets 名稱');
+                return;
+            }
+            
+            showLoading(`正在載入 ${supportedGames[gameType].name} 歷史資料...`);
+            
+            try {
+                const response = await fetch('/api/history', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        game_type: gameType,
+                        periods: parseInt(periods),
+                        sheet_name: sheetName
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayHistoryData(data);
+                } else {
+                    showError('載入歷史資料失敗：' + data.error + 
+                             (data.suggestion ? '<br>建議：' + data.suggestion : ''));
+                }
+            } catch (error) {
+                showError('載入歷史資料時發生錯誤：' + error.message);
+            }
+        }
+
+        // 顯示預測結果
+        function displayPredictionResult(data) {
+            const gameInfo = supportedGames[document.getElementById('gameType').value];
+            let numbersHtml = '';
+            
+            // 顯示一般號碼
+            data.predicted_numbers.forEach(num => {
+                numbersHtml += `<div class="number-ball">${num}</div>`;
+            });
+            
+            // 顯示特別號（如果有）
+            if (data.predicted_special && gameInfo.special_number) {
+                numbersHtml += `<div class="number-ball special-ball">${data.predicted_special}</div>`;
+            }
+            
+            const resultHtml = `
+                <div class="result-card">
+                    <div class="result-title">🎯 ${data.game_type} 預測結果</div>
+                    <div class="numbers-display">
+                        ${numbersHtml}
+                    </div>
+                    <div class="result-info">
+                        <div class="info-item">
+                            <div class="info-label">預測方法</div>
+                            <div class="info-value">${data.method}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">信心度</div>
+                            <div class="info-value">${(data.confidence * 100).toFixed(1)}%</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">參考期數</div>
+                            <div class="info-value">${data.data_count} 期</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">預測時間</div>
+                            <div class="info-value">${data.prediction_date}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('results').innerHTML = resultHtml;
+        }
+
+        // 顯示歷史資料
+        function displayHistoryData(data) {
+            let historyHtml = `
+                <div class="result-card">
+                    <div class="result-title">📊 ${data.game_type} 歷史資料</div>
+                    <div class="result-info">
+                        <div class="info-item">
+                            <div class="info-label">資料筆數</div>
+                            <div class="info-value">${data.data_count} 期</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; max-height: 400px; overflow-y: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: rgba(255,255,255,0.2);">
+                                    <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.3);">期別</th>
+                                    <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.3);">日期</th>
+                                    <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.3);">開獎號碼</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            data.data.forEach(item => {
+                let numbersDisplay = item.numbers.join(', ');
+                if (item.special_number) {
+                    numbersDisplay += ` (特別號: ${item.special_number})`;
+                }
+                
+                historyHtml += `
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">${item.period}</td>
+                        <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">${item.date}</td>
+                        <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">${numbersDisplay}</td>
+                    </tr>
+                `;
+            });
+            
+            historyHtml += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('results').innerHTML = historyHtml;
+        }
+
+        // 顯示載入中
+        function showLoading(message) {
+            document.getElementById('results').innerHTML = `
+                <div class="loading">
+                    <div style="font-size: 2em; margin-bottom: 10px;">⏳</div>
+                    ${message}
+                </div>
+            `;
+        }
+
+        // 顯示錯誤訊息
+        function showError(message) {
+            document.getElementById('results').innerHTML = `
+                <div class="error">
+                    <strong>❌ 錯誤</strong><br>
+                    ${message}
+                </div>
+            `;
+        }
+
+        // 顯示成功訊息
+        function showSuccess(message) {
+            document.getElementById('results').innerHTML = `
+                <div class="success">
+                    <strong>✅ 成功</strong><br>
+                    ${message}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
+

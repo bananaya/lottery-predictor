@@ -3,442 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>大樂透號碼預測系統</title>
+    <title>多樂透遊戲預測系統</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: linear-gradient(45deg, #ff6b6b, #feca57);
-            color: white;
-            text-align: center;
-            padding: 30px;
-        }
-        
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-        
-        .content {
-            padding: 40px;
-        }
-        
-        .section {
-            margin-bottom: 30px;
-            padding: 25px;
-            border: 2px solid #f0f0f0;
-            border-radius: 10px;
-            background: #fafafa;
-        }
-        
-        .section h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #555;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .result {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 8px;
-            display: none;
-        }
-        
-        .result.success {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-        }
-        
-        .result.error {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-        }
-        
-        .numbers {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-            flex-wrap: wrap;
-        }
-        
-        .number {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #ff6b6b, #feca57);
-            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 18px;
-        }
-        
-        .special-number {
-            background: linear-gradient(45deg, #667eea, #764ba2) !important;
-        }
-        
-        .loading {
-            text-align: center;
             padding: 20px;
         }
-        
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+
+        .welcome-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 60px 40px;
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .info {
-            background: #e3f2fd;
-            border: 1px solid #bbdefb;
-            color: #0d47a1;
-            padding: 15px;
-            border-radius: 8px;
+
+        .logo {
+            font-size: 4em;
             margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .feature {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .feature-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .feature-text {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .enter-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .enter-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .version-info {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-container {
+                padding: 40px 20px;
+            }
+
+            .title {
+                font-size: 2em;
+            }
+
+            .logo {
+                font-size: 3em;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🎱 大樂透號碼預測系統</h1>
-            <p>使用 AI 技術分析歷史資料，預測下一期最佳號碼</p>
+    <div class="welcome-container">
+        <div class="logo">🎰</div>
+        <h1 class="title">多樂透遊戲預測系統</h1>
+        <p class="subtitle">
+            支援所有台灣彩券樂透遊戲的智能預測平台<br>
+            運用先進演算法，提供高信心度的號碼預測
+        </p>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-text">9種樂透遊戲</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🧠</div>
+                <div class="feature-text">4種預測演算法</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <div class="feature-text">Google Sheets整合</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-text">即時資料爬取</div>
+            </div>
         </div>
-        
-        <div class="content">
-            <div class="info">
-                <strong>使用說明：</strong>
-                <br>1. 輸入要參考的期數和 Google Sheets 名稱
-                <br>2. 點擊「爬取資料」獲取歷史開獎資料
-                <br>3. 點擊「預測號碼」進行 AI 預測
-                <br>4. 所有資料會自動儲存到您的 Google Sheets
-            </div>
-            
-            <div class="section">
-                <h2>📊 資料設                <div class="form-group">
-                    <label for="periods">參考期數：</label>
-                    <input type="number" id="periods" value="20" min="5" max="500">
-                </div>
-                
-                <div class="form-group">
-                    <label for="sheetName">Google Sheets 名稱：</label>
-                    <input type="text" id="sheetName" placeholder="請輸入試算表名稱" value="大樂透資料">
-                </div>
-                
-                <div class="form-group">
-                    <label for="minConfidence">最低信心度：</label>
-                    <input type="range" id="minConfidence" min="0.5" max="0.99" step="0.01" value="0.7">
-                    <span id="confidenceValue">70%</span>
-                </div>
-                
-                <div class="form-group">
-                    <label for="predictionMethod">預測方法：</label>
-                    <select id="predictionMethod">
-                        <option value="hybrid">混合演算法（推薦）</option>
-                        <option value="frequency">頻率分析</option>
-                        <option value="pattern">模式識別</option>
-                        <option value="ml">機器學習</option>
-                    </select>
-                </div>         <button class="btn" onclick="crawlData()">📥 爬取歷史資料</button>
-                <button class="btn" onclick="getHistory()">📋 查看歷史資料</button>
-            </div>
-            
-            <div class="section">
-                <h2>🔮 號碼預測</h2>
-				<div class="form-group">
-					<label for="totalPredictions">預測組數：</label>
-					<input type="number" id="totalPredictions" value="100" min="1" max="200">
-				</div>
-                <button class="btn" onclick="predictNumbers()">🎯 預測下一期號碼</button>
-                <button class="btn" onclick="healthCheck()">❤️ 系統健康檢查</button>
-            </div>
-            
-            <div id="loading" class="loading" style="display: none;">
-                <div class="spinner"></div>
-                <p>處理中，請稍候...</p>
-            </div>
-            
-            <div id="result" class="result"></div>
+
+        <a href="/multi_lottery.html" class="enter-btn">開始預測</a>
+
+        <div class="version-info">
+            版本 3.0 - 多樂透遊戲支援版本<br>
+            支援：大樂透、威力彩、今彩539、雙贏彩、3星彩、4星彩、BINGO BINGO、38樂合彩、49樂合彩
         </div>
     </div>
-
-    <script>
-        const API_BASE = '/api/lottery';
-        
-        // 初始化信心度滑桿
-        document.addEventListener('DOMContentLoaded', function() {
-            const confidenceSlider = document.getElementById('minConfidence');
-            const confidenceValue = document.getElementById('confidenceValue');
-            
-            // 更新信心度顯示
-            confidenceSlider.addEventListener('input', function() {
-                const value = (this.value * 100).toFixed(0);
-                confidenceValue.textContent = value + '%';
-            });
-        });
-        
-        function showLoading() {
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('result').style.display = 'none';
-        }
-        
-        function hideLoading() {
-            document.getElementById('loading').style.display = 'none';
-        }
-        
-        function showResult(message, isSuccess = true, data = null) {
-            hideLoading();
-            const resultDiv = document.getElementById('result');
-            resultDiv.className = `result ${isSuccess ? 'success' : 'error'}`;
-            resultDiv.innerHTML = message;
-            resultDiv.style.display = 'block';
-            
-            if (data && data.predicted_numbers) {
-                const numbersHtml = `
-                    <div style="margin-top: 20px;">
-                        <h3>🎯 預測號碼：</h3>
-                        <div class="numbers">
-                            ${data.predicted_numbers.map(num => `<div class="number">${num}</div>`).join('')}
-                            <div class="number special-number">${data.predicted_special}</div>
-                        </div>
-                        <p><strong>預測時間：</strong> ${data.prediction_date}</p>
-                        <p><strong>信心度：</strong> ${(data.confidence * 100).toFixed(1)}%</p>
-                    </div>
-                `;
-                resultDiv.innerHTML += numbersHtml;
-            }
-        }
-        
-        async function crawlData() {
-            const periods = document.getElementById('periods').value;
-            const sheetName = document.getElementById('sheetName').value;
-            
-            if (!periods || !sheetName) {
-                showResult('請填寫所有必要欄位', false);
-                return;
-            }
-            
-            showLoading();
-            
-            try {
-                const response = await fetch(`${API_BASE}/crawl`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        periods: parseInt(periods),
-                        sheet_name: sheetName
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    showResult(`✅ ${data.message}`, true);
-                } else {
-                    showResult(`❌ 錯誤：${data.error}`, false);
-                }
-            } catch (error) {
-                showResult(`❌ 網路錯誤：${error.message}`, false);
-            }
-        }
-        
-        async function predictNumbers() {
-            const periods = document.getElementById('periods').value;
-            const sheetName = document.getElementById('sheetName').value;
-            const minConfidence = document.getElementById('minConfidence').value;
-            const method = document.getElementById('predictionMethod').value;
-			const totalPredictions = document.getElementById('totalPredictions').value;
-            
-            if (!periods || !sheetName || !totalPredictions) {
-                showResult('請填寫所有必要欄位', false);
-                return;
-            }
-            
-            showLoading();
-            
-            try {
-                const response = await fetch(`${API_BASE}/predict`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        periods: parseInt(periods),
-                        sheet_name: sheetName,
-                        min_confidence: parseFloat(minConfidence),
-                        method: method,
-						total_predictions: parseInt(totalPredictions)
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    // 顯示詳細的預測結果
-                    const prediction = data.best_prediction;
-                    const confidence = (prediction.confidence * 100).toFixed(1);
-                    const minRequired = (data.min_confidence_required * 100).toFixed(0);
-                    
-                    let resultHtml = `
-                        <div class="prediction-result">
-                            <h3>🎯 預測完成</h3>
-                            <div class="prediction-info">
-                                <p><strong>預測方法：</strong> ${data.method_used}</p>
-                                <p><strong>參考資料：</strong> ${data.historical_data_count} 期</p>
-                                <p><strong>信心度：</strong> ${confidence}% (要求: ${minRequired}%)</p>
-                                <p><strong>預測時間：</strong> ${prediction.prediction_date}</p>
-                            </div>
-                        </div>
-                    `;
-                    
-                    showResult(resultHtml, true, prediction);
-                } else {
-                    let errorMsg = `❌ 錯誤：${data.error}`;
-                    if (data.message) {
-                        errorMsg += `<br>💡 建議：${data.message}`;
-                    }
-                    showResult(errorMsg, false);
-                }
-            } catch (error) {
-                showResult(`❌ 網路錯誤：${error.message}`, false);
-            }
-        }
-        
-        async function getHistory() {
-            const periods = document.getElementById('periods').value;
-            
-            showLoading();
-            
-            try {
-                const response = await fetch(`${API_BASE}/history?periods=${periods}`);
-                const data = await response.json();
-                
-                if (response.ok) {
-                    let historyHtml = `<h3>📊 最近 ${data.data.length} 期歷史資料：</h3>`;
-                    data.data.slice(0, 5).forEach(item => {
-                        historyHtml += `
-                            <div style="margin: 10px 0; padding: 10px; background: #f9f9f9; border-radius: 5px;">
-                                <strong>第 ${item.period} 期 (${item.date})：</strong>
-                                <div class="numbers">
-                                    ${item.numbers.map(num => `<div class="number" style="width: 35px; height: 35px; font-size: 14px;">${num}</div>`).join('')}
-                                    <div class="number special-number" style="width: 35px; height: 35px; font-size: 14px;">${item.special_number}</div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    showResult(historyHtml, true);
-                } else {
-                    showResult(`❌ 錯誤：${data.error}`, false);
-                }
-            } catch (error) {
-                showResult(`❌ 網路錯誤：${error.message}`, false);
-            }
-        }
-        
-        async function healthCheck() {
-            showLoading();
-            
-            try {
-                const response = await fetch(`${API_BASE}/health`);
-                const data = await response.json();
-                
-                if (response.ok) {
-                    showResult(`✅ 系統運行正常！時間：${data.timestamp}`, true);
-                } else {
-                    showResult('❌ 系統異常', false);
-                }
-            } catch (error) {
-                showResult(`❌ 無法連接到服務器：${error.message}`, false);
-            }
-        }
-    </script>
 </body>
 </html>
 
