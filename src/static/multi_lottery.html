@@ -418,6 +418,11 @@
         async function loadSupportedGames() {
             try {
                 const response = await fetch('/api/games');
+				if (!response.ok) {
+					const text = await response.text();
+					throw new Error('API 回傳錯誤：' + text);
+				}
+				
                 const data = await response.json();
                 
                 if (data.success) {
