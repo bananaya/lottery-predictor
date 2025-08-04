@@ -16,7 +16,7 @@ app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
 CORS(app)
 
 app.register_blueprint(user_bp, url_prefix='/api')
-app.register_blueprint(multi_lottery_bp, url_prefix='/api')
+app.register_blueprint(multi_lottery_bp, url_prefix='/api/lottery')
 
 # uncomment if you need to use database
 # app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"

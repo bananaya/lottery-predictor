@@ -396,6 +396,8 @@
     </div>
 
     <script>
+		const API_BASE = '/api/lottery';
+		
         let supportedGames = {};
 
         // 頁面載入時初始化
@@ -417,7 +419,7 @@
         // 載入支援的遊戲列表
         async function loadSupportedGames() {
             try {
-                const response = await fetch('/api/games', { cache: 'no-store' });  // 👈 強制不使用快取
+                const response = await fetch('${API_BASE}/games', { cache: 'no-store' });  // 👈 強制不使用快取
 
 				if (!response.ok) {
 					const text = await response.text();
@@ -483,7 +485,7 @@
             showLoading('正在檢查系統狀態...');
             
             try {
-                const response = await fetch('/api/health');
+                const response = await fetch('${API_BASE}/health');
                 const data = await response.json();
                 
                 if (data.success) {
@@ -519,7 +521,7 @@
             showLoading(`正在爬取 ${supportedGames[gameType].name} 最近 ${periods} 期資料...`);
             
             try {
-                const response = await fetch('/api/crawl', {
+                const response = await fetch('${API_BASE}/crawl', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -567,7 +569,7 @@
             showLoading(`正在預測 ${supportedGames[gameType].name} 下一期號碼...`);
             
             try {
-                const response = await fetch('/api/predict', {
+                const response = await fetch('${API_BASE}/predict', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -613,7 +615,7 @@
             showLoading(`正在載入 ${supportedGames[gameType].name} 歷史資料...`);
             
             try {
-                const response = await fetch('/api/history', {
+                const response = await fetch('${API_BASE}/history', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

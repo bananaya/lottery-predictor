@@ -28,7 +28,7 @@ crawler = MultiLotteryCrawler()
 sheets_manager = MultiLotteryGoogleSheetsManager()
 predictor = MultiLotteryPredictionAlgorithm()
 
-@multi_lottery_bp.route('/api/games', methods=['GET'])
+@multi_lottery_bp.route('/games', methods=['GET'])
 def get_supported_games():
     """獲取支援的樂透遊戲列表"""
     try:
@@ -62,7 +62,7 @@ def get_supported_games():
             'error': f'獲取遊戲列表時發生錯誤: {str(e)}'
         }), 500
 
-@multi_lottery_bp.route('/api/crawl', methods=['POST'])
+@multi_lottery_bp.route('/crawl', methods=['POST'])
 def crawl_lottery_data():
     """爬取樂透資料"""
     try:
@@ -106,7 +106,7 @@ def crawl_lottery_data():
             'traceback': traceback.format_exc()
         }), 500
 
-@multi_lottery_bp.route('/api/predict', methods=['POST'])
+@multi_lottery_bp.route('/predict', methods=['POST'])
 def predict_numbers():
     """預測樂透號碼"""
     try:
@@ -193,7 +193,7 @@ def predict_numbers():
             'traceback': traceback.format_exc()
         }), 500
 
-@multi_lottery_bp.route('/api/history', methods=['POST'])
+@multi_lottery_bp.route('/history', methods=['POST'])
 def get_historical_data():
     """獲取歷史開獎資料"""
     try:
@@ -232,7 +232,7 @@ def get_historical_data():
             'error': f'獲取歷史資料時發生錯誤: {str(e)}'
         }), 500
 
-@multi_lottery_bp.route('/api/prediction-history', methods=['POST'])
+@multi_lottery_bp.route('/prediction-history', methods=['POST'])
 def get_prediction_history():
     """獲取預測歷史記錄"""
     try:
@@ -257,7 +257,7 @@ def get_prediction_history():
             'error': f'獲取預測歷史時發生錯誤: {str(e)}'
         }), 500
 
-@multi_lottery_bp.route('/api/health', methods=['GET'])
+@multi_lottery_bp.route('/health', methods=['GET'])
 def health_check():
     """系統健康檢查"""
     try:
@@ -286,7 +286,7 @@ def health_check():
         }), 500
 
 # 處理衍生樂透遊戲的特殊端點
-@multi_lottery_bp.route('/api/derived-games', methods=['POST'])
+@multi_lottery_bp.route('/derived-games', methods=['POST'])
 def handle_derived_games():
     """處理衍生樂透遊戲（38樂合彩、49樂合彩）"""
     try:
