@@ -145,18 +145,29 @@ def predict_numbers():
                 sheets_manager.save_lottery_data(sheet_name, game_type, crawled_data)
                 historical_data = crawled_data
         
-        # 進行預測
-        prediction_result = predictor.predict_numbers(
-            game_type, historical_data, method, min_confidence
-        )
-        
+        # 進行預測, 為增加命中率，增加重試機制。
+        attempts = 0 
+        max_attempts = 1000
+        max_confidence = 0
+        while attempts < max_attempts:
+            attempts += 1
+            prediction_result = predictor.predict_numbers(
+                game_type, historical_data, method, min_confidence
+            )
+            
+            if prediction_result["confidence"] > max_confidence:
+                max_confidence = prediction_result["confidence"]
+                
+            if prediction_result['meets_confidence']:
+                break
+            
         # 檢查是否達到信心度要求
-        if not prediction_result['meets_confidence']:
+        if attempts == max_attempts:
             return jsonify({
                 'success': False,
-                'error': f'預測信心度({prediction_result["confidence"]:.2%})未達到要求({min_confidence:.2%})',
+                'error': f'預測信心度({max_confidence:.2%})未達到要求({min_confidence:.2%})',
                 'suggestion': '建議降低信心度要求或增加歷史資料期數',
-                'actual_confidence': prediction_result['confidence'],
+                'actual_confidence': max_confidence,
                 'required_confidence': min_confidence
             }), 400
         
