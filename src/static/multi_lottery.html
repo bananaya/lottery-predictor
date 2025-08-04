@@ -396,9 +396,7 @@
     </div>
 
     <script>
-		const API_BASE = '/api/lottery';
-		
-        let supportedGames = {};
+	let supportedGames = {};
 
         // 頁面載入時初始化
         document.addEventListener('DOMContentLoaded', function() {
@@ -485,7 +483,7 @@
             showLoading('正在檢查系統狀態...');
             
             try {
-                const response = await fetch('${API_BASE}/health');
+                const response = await fetch('/api/lottery/health');
                 const data = await response.json();
                 
                 if (data.success) {
@@ -521,7 +519,7 @@
             showLoading(`正在爬取 ${supportedGames[gameType].name} 最近 ${periods} 期資料...`);
             
             try {
-                const response = await fetch('${API_BASE}/crawl', {
+                const response = await fetch('/api/lottery/crawl', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -569,7 +567,7 @@
             showLoading(`正在預測 ${supportedGames[gameType].name} 下一期號碼...`);
             
             try {
-                const response = await fetch('${API_BASE}/predict', {
+                const response = await fetch('/api/lottery/predict', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -615,7 +613,7 @@
             showLoading(`正在載入 ${supportedGames[gameType].name} 歷史資料...`);
             
             try {
-                const response = await fetch('${API_BASE}/history', {
+                const response = await fetch('/api/lottery/history', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
