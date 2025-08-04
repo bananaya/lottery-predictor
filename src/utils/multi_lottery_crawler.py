@@ -90,7 +90,7 @@ class MultiLotteryCrawler:
                 'game_key': 'lotto4d',
                 'extract_func': 'extract_4stars'
             },
-            'lotto49m6': {
+            '49lotto': {
                 'name': '49樂合彩',
                 'url': 'https://www.taiwanlottery.com/lotto/4stars/history.aspx',
                 'number_range': (1, 49),
@@ -100,7 +100,7 @@ class MultiLotteryCrawler:
                 'game_key': 'lotto49m6',
                 'extract_func': 'extract_lotto49m6'
             },
-            'lotto39m5': {
+            '39lotto': {
                 'name': '39樂合彩',
                 'url': 'https://www.taiwanlottery.com/lotto/4stars/history.aspx',
                 'number_range': (1, 39),
