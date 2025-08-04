@@ -77,7 +77,7 @@ class MultiLotteryCrawler:
                 'special_range': None,
                 'is_digit_game': True,
                 'game_key': 'lotto3d',
-                'extract_func': 'extract_3stars'
+                'extract_func': 'extract_lotto3d'
             },
             '4stars': {
                 'name': '4星彩',
@@ -98,7 +98,7 @@ class MultiLotteryCrawler:
                 'special_number': False,
                 'special_range': None,
                 'game_key': 'lotto49m6',
-                'extract_func': 'extract_lotto49m6'
+                'extract_func': 'extract_lotto4d'
             },
             '39lotto': {
                 'name': '39樂合彩',
