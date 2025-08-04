@@ -125,9 +125,9 @@ class MultiLotteryCrawler:
     # === 3. 彩券欄位對應 ===
     @staticmethod
     # 大樂透
-    def extract_lotto649(draw):
+    def extract_lotto649(draw, game_name):
         return {
-            "game_type": '大樂透',
+            "game_type": game_name,
             "period": draw.get('期別'),
             "date": draw.get('開獎日期'),
             "numbers": draw.get('獎號'),
@@ -136,9 +136,9 @@ class MultiLotteryCrawler:
 
     @staticmethod
     # 今彩539
-    def extract_daily539(draw):
+    def extract_daily539(draw, game_name):
         return {
-            "game_type": '今彩539',
+            "game_type": game_name,
             "period": draw.get('期別'),
             "date": draw.get('開獎日期'),
             "numbers": draw.get('獎號'),
@@ -147,9 +147,9 @@ class MultiLotteryCrawler:
 
     @staticmethod
     # 威力彩
-    def extract_powerlotto(draw):
+    def extract_powerlotto(draw, game_name):
         return {
-            "game_type": '威力彩',
+            "game_type": game_name,
             "period": draw.get('期別'),
             "date": draw.get('開獎日期'),
             "numbers": draw.get('第一區'),
@@ -158,9 +158,9 @@ class MultiLotteryCrawler:
         
     @staticmethod
     # 雙贏彩
-    def extract_lotto1224(draw):
+    def extract_lotto1224(draw, game_name):
         return {
-            "game_type": '雙贏彩',
+            "game_type": game_name,
             "period": draw.get('期別'),
             "date": draw.get('開獎日期'),
             "numbers": draw.get('獎號'),
@@ -169,9 +169,9 @@ class MultiLotteryCrawler:
         
     @staticmethod
     # 3星彩
-    def extract_lotto3d(draw):
+    def extract_lotto3d(draw, game_name):
         return {
-            "game_type": '3星彩',
+            "game_type": game_name,
             "period": draw.get('期別'),
             "date": draw.get('開獎日期'),
             "numbers": draw.get('獎號'),
@@ -180,9 +180,9 @@ class MultiLotteryCrawler:
         
     @staticmethod
     # 4星彩
-    def extract_lotto4d(draw):
+    def extract_lotto4d(draw, game_name):
         return {
-            "game_type": '4星彩',
+            "game_type": game_name,
             "period": draw.get('期別'),
             "date": draw.get('開獎日期'),
             "numbers": draw.get('獎號'),
@@ -191,9 +191,9 @@ class MultiLotteryCrawler:
         
     @staticmethod
     # 49樂合彩
-    def extract_lotto49m6(draw):
+    def extract_lotto49m6(draw, game_name):
         return {
-            "game_type": '49樂合彩',
+            "game_type": game_name,
             "period": draw.get('期別'),
             "date": draw.get('開獎日期'),
             "numbers": draw.get('獎號'),
@@ -202,9 +202,9 @@ class MultiLotteryCrawler:
         
     @staticmethod
     # 39樂合彩
-    def extract_lotto39m5(draw):
+    def extract_lotto39m5(draw, game_name):
         return {
-            "game_type": '39樂合彩'
+            "game_type": game_name,
             "period": draw.get('期別'),
             "date": draw.get('開獎日期'),
             "numbers": draw.get('獎號'),
@@ -265,7 +265,7 @@ class MultiLotteryCrawler:
                         continue
                     if draw_date > now or date_str in existing_dates:
                         continue
-                    lottery_data = config['extract_func'](draw)
+                    lottery_data = config['extract_func'](draw, config['name'])
                     if lottery_data:
                         results.append(lottery_data)
                         existing_dates.add(date_str)
