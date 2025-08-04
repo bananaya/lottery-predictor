@@ -278,11 +278,11 @@ class MultiLotteryCrawler:
                         results.append(lottery_data)
                         existing_date.add(date_str)
                         draw_count += 1
-                    if draw_count >= max_draws:
+                    if draw_count >= periods:
                         break
-                if draw_count >= max_draws:
+                if draw_count >= periods:
                     break
-            if draw_count >= max_draws:
+            if draw_count >= periods:
                 break
 
         if results:                
