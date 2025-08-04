@@ -14,6 +14,12 @@ from ..utils.multi_lottery_crawler import MultiLotteryCrawler
 from ..utils.multi_google_sheets_manager import MultiLotteryGoogleSheetsManager
 from ..utils.multi_prediction_algorithm import MultiLotteryPredictionAlgorithm
 
+# 設定 logging 格式
+logging.basicConfig(
+    format="[%(asctime)s][%(name)-5s][%(levelname)-5s] %(message)s (%(filename)s:%(lineno)d)",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
 # 建立藍圖
 multi_lottery_bp = Blueprint('multi_lottery', __name__)
 
@@ -34,7 +40,7 @@ def get_supported_games():
         for game in games:
             logging.info('Get game config.')
             config = crawler.get_game_config(game)
-            logging.info(f'Get {config['name']} config completed.')
+            logging.info(f'Get {config["name"]} config completed.')
             game_info[game] = {
                 'name': config['name'],
                 'number_range': config['number_range'],

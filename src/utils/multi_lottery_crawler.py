@@ -120,7 +120,12 @@ class MultiLotteryCrawler:
     
     def get_supported_games(self) -> List[str]:
         """獲取支援的遊戲列表"""
-        return list(self.game_configs.keys())
+        try: 
+            logging.info('Get game config')
+            return list(self.game_configs.keys())
+        except Exception as e:
+            print(f"Get game config error: {e}")
+            return []
     
     # === 3. 彩券欄位對應 ===
     @staticmethod
