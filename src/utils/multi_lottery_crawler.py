@@ -247,9 +247,10 @@ class MultiLotteryCrawler:
         start_year = 2004  
         
         config = self.get_game_config(game_type)
+        extract_func = getattr(self, config['extract_func'])  # 取得函數物件   
         existing_date = set()
         results = []        
-        draw_count = 0
+        draw_count = 0        
         
         for year in range(now.year, start_year - 1, -1):
             for month in range(12, 0, -1):
@@ -272,8 +273,6 @@ class MultiLotteryCrawler:
                     if draw_date > now or date_str in existing_date:
                         continue
                         
-                    extract_func_name = config['extract_func']  # 是一個字串
-                    extract_func = getattr(self.crawler, extract_func_name)  # 取得函數物件                            
                     lottery_data = extract_func(draw, config['name'])
                     if lottery_data:
                         results.append(lottery_data)
