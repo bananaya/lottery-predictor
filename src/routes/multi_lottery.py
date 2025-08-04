@@ -21,7 +21,7 @@ logging.basicConfig(
 )
 
 # 建立藍圖
-multi_lottery_bp = Blueprint('multi_lottery', __name__)
+multi_lottery_bp = Blueprint('lottery', __name__)
 
 # 初始化模組
 crawler = MultiLotteryCrawler()
