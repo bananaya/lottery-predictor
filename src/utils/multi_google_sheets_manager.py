@@ -66,7 +66,7 @@ class MultiLotteryGoogleSheetsManager:
                 'number_columns': [f'號碼{i}' for i in range(1, 21)],
                 'special_column': None
             },
-            '38lotto': {
+            '39lotto': {
                 'sheet_name': '38樂合彩資料',
                 'headers': ['期別', '開獎日期', '號碼1', '號碼2', '號碼3', '號碼4', '號碼5'],
                 'number_columns': ['號碼1', '號碼2', '號碼3', '號碼4', '號碼5'],
@@ -80,7 +80,7 @@ class MultiLotteryGoogleSheetsManager:
             },
             'predictions': {
                 'sheet_name': '預測結果',
-                'headers': ['遊戲類型', '預測日期', '預測方法', '信心度', '參考期數', '預測號碼', '特別號'],
+                'headers': ['遊戲類型', '預測日期', '預測方法', '信心度', '參考期數', '號碼1', '號碼2', '號碼3', '號碼4', '號碼5', '號碼6', '特別號'],
                 'number_columns': [],
                 'special_column': None
             }
@@ -272,20 +272,45 @@ class MultiLotteryGoogleSheetsManager:
                 return False
             
             # 準備預測結果資料
-            row = [
-                game_type,
-                prediction_data.get('prediction_date', ''),
-                prediction_data.get('method', ''),
-                prediction_data.get('confidence', ''),
-                prediction_data.get('periods_used', ''),
-                ', '.join(map(str, prediction_data.get('predicted_numbers', []))),
-                str(prediction_data.get('predicted_special', ''))
-            ]
+            numbers = prediction.get("predicted_numbers", [])            
+            if len(numbers) >= 6:
+                row = [
+                    game_type,
+                    prediction_data.get('prediction_date', ''),
+                    prediction_data.get('method', ''),
+                    prediction_data.get('confidence', ''),
+                    prediction_data.get('periods_used', ''),
+                    numbers[0] if len(numbers) > 0 else "",
+                    numbers[1] if len(numbers) > 1 else "",
+                    numbers[2] if len(numbers) > 2 else "",
+                    numbers[3] if len(numbers) > 3 else "",
+                    numbers[4] if len(numbers) > 4 else "",
+                    numbers[5] if len(numbers) > 5 else "",
+                    str(prediction_data.get('predicted_special', ''))
+                ]
             
-            # 新增到工作表
-            worksheet.append_row(row)
-            print(f"成功儲存 {game_type} 預測結果")
-            return True
+                # 新增到工作表
+                worksheet.append_row(row)
+                print(f"成功儲存 {game_type} 預測結果")
+                return True
+            else:
+                print("預測資料格式不正確")
+                return False
+            
+            # row = [
+                # game_type,
+                # prediction_data.get('prediction_date', ''),
+                # prediction_data.get('method', ''),
+                # prediction_data.get('confidence', ''),
+                # prediction_data.get('periods_used', ''),
+                # ', '.join(map(str, prediction_data.get('predicted_numbers', []))),
+                # str(prediction_data.get('predicted_special', ''))
+            # ]
+                
+            # # 新增到工作表
+            # worksheet.append_row(row)
+            # print(f"成功儲存 {game_type} 預測結果")
+            # return True
             
         except Exception as e:
             print(f"儲存預測結果時發生錯誤: {e}")
