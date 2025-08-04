@@ -417,10 +417,11 @@
         // 載入支援的遊戲列表
         async function loadSupportedGames() {
             try {
-                const response = await fetch('/api/games');
+                const response = await fetch('/api/games', { cache: 'no-store' });  // 👈 強制不使用快取
+
 				if (!response.ok) {
 					const text = await response.text();
-					throw new Error('API 回傳錯誤：' + text);
+					throw new Error('API 錯誤（' + response.status + '）：' + text);
 				}
 				
                 const data = await response.json();
