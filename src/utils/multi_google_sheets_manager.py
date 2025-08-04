@@ -67,7 +67,7 @@ class MultiLotteryGoogleSheetsManager:
                 'special_column': None
             },
             '39lotto': {
-                'sheet_name': '38樂合彩資料',
+                'sheet_name': '39樂合彩資料',
                 'headers': ['期別', '開獎日期', '號碼1', '號碼2', '號碼3', '號碼4', '號碼5'],
                 'number_columns': ['號碼1', '號碼2', '號碼3', '號碼4', '號碼5'],
                 'special_column': None
@@ -272,7 +272,7 @@ class MultiLotteryGoogleSheetsManager:
                 return False
             
             # 準備預測結果資料
-            numbers = prediction.get("predicted_numbers", [])
+            numbers = prediction_data.get("predicted_numbers", [])
             row = [
                 game_type,
                 prediction_data.get('prediction_date', ''),
