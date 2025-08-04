@@ -12,6 +12,8 @@ from datetime import datetime, timedelta
 import time
 import random
 from typing import List, Dict, Optional, Tuple
+from TaiwanLottery import TaiwanLotteryCrawler
+import logging
 
 class MultiLotteryCrawler:
     """多樂透遊戲爬蟲類別"""
@@ -22,6 +24,7 @@ class MultiLotteryCrawler:
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         })
+        self.crawler = TaiwanLotteryCrawler()
         
         # 樂透遊戲配置
         self.game_configs = {
@@ -31,7 +34,9 @@ class MultiLotteryCrawler:
                 'number_range': (1, 49),
                 'number_count': 6,
                 'special_number': True,
-                'special_range': (1, 49)
+                'special_range': (1, 49),
+                'game_key': 'lotto649',
+                'extract_func': 'extract_lotto649'
             },
             'superlotto638': {
                 'name': '威力彩',
@@ -39,7 +44,9 @@ class MultiLotteryCrawler:
                 'number_range': (1, 38),
                 'number_count': 6,
                 'special_number': True,
-                'special_range': (1, 8)
+                'special_range': (1, 8),
+                'game_key': 'super_lotto',
+                'extract_func': 'extract_powerlotto'
             },
             'dailycash': {
                 'name': '今彩539',
@@ -47,7 +54,9 @@ class MultiLotteryCrawler:
                 'number_range': (1, 39),
                 'number_count': 5,
                 'special_number': False,
-                'special_range': None
+                'special_range': None,
+                'game_key': 'daily_cash',
+                'extract_func': 'extract_daily539'
             },
             'lotto1224': {
                 'name': '雙贏彩',
@@ -55,7 +64,9 @@ class MultiLotteryCrawler:
                 'number_range': (1, 24),
                 'number_count': 12,
                 'special_number': False,
-                'special_range': None
+                'special_range': None,
+                'game_key': 'lotto1224',
+                'extract_func': 'extract_lotto1224'
             },
             '3stars': {
                 'name': '3星彩',
@@ -64,7 +75,9 @@ class MultiLotteryCrawler:
                 'number_count': 3,
                 'special_number': False,
                 'special_range': None,
-                'is_digit_game': True
+                'is_digit_game': True,
+                'game_key': 'lotto3d',
+                'extract_func': 'extract_3stars'
             },
             '4stars': {
                 'name': '4星彩',
@@ -73,15 +86,29 @@ class MultiLotteryCrawler:
                 'number_count': 4,
                 'special_number': False,
                 'special_range': None,
-                'is_digit_game': True
+                'is_digit_game': True,
+                'game_key': 'lotto4d',
+                'extract_func': 'extract_4stars'
             },
-            'bingobingo': {
-                'name': 'BINGO BINGO 賓果賓果',
-                'url': 'https://www.taiwanlottery.com/lotto/bingobingo/history.aspx',
-                'number_range': (1, 80),
-                'number_count': 20,
+            'lotto49m6': {
+                'name': '49樂合彩',
+                'url': 'https://www.taiwanlottery.com/lotto/4stars/history.aspx',
+                'number_range': (1, 49),
+                'number_count': 6,
                 'special_number': False,
-                'special_range': None
+                'special_range': None,
+                'game_key': 'lotto49m6',
+                'extract_func': 'extract_lotto49m6'
+            },
+            'lotto39m5': {
+                'name': '39樂合彩',
+                'url': 'https://www.taiwanlottery.com/lotto/4stars/history.aspx',
+                'number_range': (1, 39),
+                'number_count': 5,
+                'special_number': False,
+                'special_range': None,
+                'game_key': 'lotto39m5',
+                'extract_func': 'extract_lotto39m5'
             }
         }
     
@@ -94,6 +121,95 @@ class MultiLotteryCrawler:
     def get_supported_games(self) -> List[str]:
         """獲取支援的遊戲列表"""
         return list(self.game_configs.keys())
+    
+    # === 3. 彩券欄位對應 ===
+    @staticmethod
+    # 大樂透
+    def extract_lotto649(draw):
+        return {
+            "game_type": '大樂透'
+            "period": draw.get('期別'),
+            "date": draw.get('開獎日期'),
+            "numbers": draw.get('獎號'),
+            "special_number": draw.get('特別號')
+        }
+
+    @staticmethod
+    # 今彩539
+    def extract_daily539(draw):
+        return {
+            "game_type": '今彩539'
+            "period": draw.get('期別'),
+            "date": draw.get('開獎日期'),
+            "numbers": draw.get('獎號'),
+            "special_number": None
+        }
+
+    @staticmethod
+    # 威力彩
+    def extract_powerlotto(draw):
+        return {
+            "game_type": '威力彩'
+            "period": draw.get('期別'),
+            "date": draw.get('開獎日期'),
+            "numbers": draw.get('第一區'),
+            "special_number": draw.get('第二區')
+        }
+        
+    @staticmethod
+    # 雙贏彩
+    def extract_lotto1224(draw):
+        return {
+            "game_type": '雙贏彩'
+            "period": draw.get('期別'),
+            "date": draw.get('開獎日期'),
+            "numbers": draw.get('獎號'),
+            "special_number": None
+        }
+        
+    @staticmethod
+    # 3星彩
+    def extract_lotto3d(draw):
+        return {
+            "game_type": '3星彩'
+            "period": draw.get('期別'),
+            "date": draw.get('開獎日期'),
+            "numbers": draw.get('獎號'),
+            "special_number": None
+        }
+        
+    @staticmethod
+    # 4星彩
+    def extract_lotto4d(draw):
+        return {
+            "game_type": '4星彩'
+            "period": draw.get('期別'),
+            "date": draw.get('開獎日期'),
+            "numbers": draw.get('獎號'),
+            "special_number": None
+        }
+        
+    @staticmethod
+    # 49樂合彩
+    def extract_lotto49m6(draw):
+        return {
+            "game_type": '49樂合彩'
+            "period": draw.get('期別'),
+            "date": draw.get('開獎日期'),
+            "numbers": draw.get('獎號'),
+            "special_number": None
+        }
+        
+    @staticmethod
+    # 39樂合彩
+    def extract_lotto39m5(draw):
+        return {
+            "game_type": '39樂合彩'
+            "period": draw.get('期別'),
+            "date": draw.get('開獎日期'),
+            "numbers": draw.get('獎號'),
+            "special_number": None
+        }
     
     def crawl_lottery_data(self, game_type: str, periods: int = 20) -> List[Dict]:
         """
@@ -108,78 +224,128 @@ class MultiLotteryCrawler:
         """
         config = self.get_game_config(game_type)
         
-        # 根據遊戲類型選擇爬取方法
-        if game_type in ['lotto649', 'superlotto638', 'dailycash', 'lotto1224']:
-            return self._crawl_standard_lottery(game_type, periods)
-        elif game_type in ['3stars', '4stars']:
-            return self._crawl_star_lottery(game_type, periods)
-        elif game_type == 'bingobingo':
-            return self._crawl_bingo_lottery(periods)
-        else:
-            raise ValueError(f"未實作的遊戲類型: {game_type}")
+        return self._crawl_standard_lottery(game_type, periods)
+        
+        # # 根據遊戲類型選擇爬取方法
+        # if game_type in ['lotto649', 'superlotto638', 'dailycash', 'lotto1224', 'lotto49m6', 'lotto39m5']:
+            # return self._crawl_standard_lottery(game_type, periods)
+        # elif game_type in ['3stars', '4stars']:
+            # return self._crawl_star_lottery(game_type, periods)
+        # elif game_type == 'bingobingo':
+            # return self._crawl_bingo_lottery(periods)
+        # else:
+            # raise ValueError(f"未實作的遊戲類型: {game_type}")
     
     def _crawl_standard_lottery(self, game_type: str, periods: int) -> List[Dict]:
-        """爬取標準樂透遊戲資料（大樂透、威力彩、今彩539、雙贏彩）"""
+        """爬取標準樂透遊戲資料（大樂透、威力彩、今彩539、雙贏彩、49樂合彩、39樂合彩）"""
+        now = datetime.now()
+        start_year = 2004  
+        
         config = self.get_game_config(game_type)
-        results = []
+        results = []        
+        draw_count = 0
         
-        try:
-            # 使用台灣彩券官方網站的歷史開獎結果頁面
-            url = f"https://www.taiwanlottery.com/lotto/result/{game_type}/"
-            
-            # 模擬瀏覽器請求
-            time.sleep(random.uniform(1, 3))  # 隨機延遲
-            response = self.session.get(url, timeout=10)
-            response.raise_for_status()
-            
-            soup = BeautifulSoup(response.text, 'html.parser')
-            
-            # 解析開獎結果表格
-            table = soup.find('table', class_='table')
-            if not table:
-                # 嘗試其他可能的表格選擇器
-                table = soup.find('table')
-            
-            if table:
-                rows = table.find_all('tr')[1:]  # 跳過表頭
-                
-                for i, row in enumerate(rows[:periods]):
-                    cols = row.find_all('td')
-                    if len(cols) >= 3:
-                        # 解析期別
-                        period = cols[0].get_text(strip=True)
-                        
-                        # 解析開獎日期
-                        date_text = cols[1].get_text(strip=True)
-                        draw_date = self._parse_date(date_text)
-                        
-                        # 解析開獎號碼
-                        numbers_text = cols[2].get_text(strip=True)
-                        numbers, special_number = self._parse_numbers(numbers_text, config)
-                        
-                        if numbers:
-                            result = {
-                                'period': period,
-                                'date': draw_date,
-                                'numbers': numbers,
-                                'game_type': config['name']
-                            }
-                            
-                            if special_number is not None:
-                                result['special_number'] = special_number
-                            
-                            results.append(result)
-            
-            # 如果官方網站無法獲取資料，使用備用資料源
-            if not results:
-                results = self._crawl_backup_source(game_type, periods)
-                
-        except Exception as e:
-            print(f"爬取 {config['name']} 資料時發生錯誤: {e}")
-            # 嘗試備用資料源
-            results = self._crawl_backup_source(game_type, periods)
+        for year in range(now.year, start_year - 1, -1):
+            for month in range(12, 0, -1):
+                if year == now.year and month > now.month:
+                    continue
+                try:
+                    result = getattr(self.crawler, config['game_key'])([str(year), f"{month:02d}"])
+                except Exception as e:
+                    logging.warning(f"⚠️ 抓取失敗 {game_key} {year}/{month:02d}：{e}")
+                    continue
+                for draw in sorted(result, key=lambda x: x.get('開獎日期'), reverse=True):
+                    date_str = draw.get('開獎日期')
+                    if not date_str:
+                        continue
+                    try:
+                        draw_date = datetime.strptime(date_str[:10], "%Y-%m-%d")
+                        date_str = draw_date.strftime("%Y/%m/%d")
+                    except Exception:
+                        continue
+                    if draw_date > now or date_str in existing_dates:
+                        continue
+                    lottery_data = config['extract_func'](draw)
+                    if lottery_data:
+                        results.append(lottery_data)
+                        existing_dates.add(date_str)
+                        draw_count += 1
+                    if draw_count >= max_draws:
+                        break
+                if draw_count >= max_draws:
+                    break
+            if draw_count >= max_draws:
+                break
+
+        if results:                
+            logging.info(f"✅ {config['name']} 寫入 {len(results)} 筆")
+            return results
+        else:            
+            logging.warning(f"⚠️ {config['name']} 沒有新資料")
+            return [] 
+   
+    # def _crawl_standard_lottery(self, game_type: str, periods: int) -> List[Dict]:
+        # """爬取標準樂透遊戲資料（大樂透、威力彩、今彩539、雙贏彩、49樂合彩、39樂合彩）"""
+        # config = self.get_game_config(game_type)
+        # results = []
         
-        return results
+        # try:
+            # # 使用台灣彩券官方網站的歷史開獎結果頁面
+            # url = f"https://www.taiwanlottery.com/lotto/result/{game_type}/"
+            
+            # # 模擬瀏覽器請求
+            # time.sleep(random.uniform(1, 3))  # 隨機延遲
+            # response = self.session.get(url, timeout=10)
+            # response.raise_for_status()
+            
+            # soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # # 解析開獎結果表格
+            # table = soup.find('table', class_='table')
+            # if not table:
+                # # 嘗試其他可能的表格選擇器
+                # table = soup.find('table')
+            
+            # if table:
+                # rows = table.find_all('tr')[1:]  # 跳過表頭
+                
+                # for i, row in enumerate(rows[:periods]):
+                    # cols = row.find_all('td')
+                    # if len(cols) >= 3:
+                        # # 解析期別
+                        # period = cols[0].get_text(strip=True)
+                        
+                        # # 解析開獎日期
+                        # date_text = cols[1].get_text(strip=True)
+                        # draw_date = self._parse_date(date_text)
+                        
+                        # # 解析開獎號碼
+                        # numbers_text = cols[2].get_text(strip=True)
+                        # numbers, special_number = self._parse_numbers(numbers_text, config)
+                        
+                        # if numbers:
+                            # result = {
+                                # 'period': period,
+                                # 'date': draw_date,
+                                # 'numbers': numbers,
+                                # 'game_type': config['name']
+                            # }
+                            
+                            # if special_number is not None:
+                                # result['special_number'] = special_number
+                            
+                            # results.append(result)
+            
+            # # 如果官方網站無法獲取資料，使用備用資料源
+            # if not results:
+                # results = self._crawl_backup_source(game_type, periods)
+                
+        # except Exception as e:
+            # print(f"爬取 {config['name']} 資料時發生錯誤: {e}")
+            # # 嘗試備用資料源
+            # results = self._crawl_backup_source(game_type, periods)
+        
+        # return results
     
     def _crawl_star_lottery(self, game_type: str, periods: int) -> List[Dict]:
         """爬取星彩遊戲資料（3星彩、4星彩）"""
