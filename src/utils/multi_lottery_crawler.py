@@ -127,7 +127,7 @@ class MultiLotteryCrawler:
     # 大樂透
     def extract_lotto649(draw):
         return {
-            "game_type": '大樂透'
+            "game_type": '大樂透',
             "period": draw.get('期別'),
             "date": draw.get('開獎日期'),
             "numbers": draw.get('獎號'),
@@ -138,7 +138,7 @@ class MultiLotteryCrawler:
     # 今彩539
     def extract_daily539(draw):
         return {
-            "game_type": '今彩539'
+            "game_type": '今彩539',
             "period": draw.get('期別'),
             "date": draw.get('開獎日期'),
             "numbers": draw.get('獎號'),
@@ -149,7 +149,7 @@ class MultiLotteryCrawler:
     # 威力彩
     def extract_powerlotto(draw):
         return {
-            "game_type": '威力彩'
+            "game_type": '威力彩',
             "period": draw.get('期別'),
             "date": draw.get('開獎日期'),
             "numbers": draw.get('第一區'),
@@ -160,7 +160,7 @@ class MultiLotteryCrawler:
     # 雙贏彩
     def extract_lotto1224(draw):
         return {
-            "game_type": '雙贏彩'
+            "game_type": '雙贏彩',
             "period": draw.get('期別'),
             "date": draw.get('開獎日期'),
             "numbers": draw.get('獎號'),
@@ -171,7 +171,7 @@ class MultiLotteryCrawler:
     # 3星彩
     def extract_lotto3d(draw):
         return {
-            "game_type": '3星彩'
+            "game_type": '3星彩',
             "period": draw.get('期別'),
             "date": draw.get('開獎日期'),
             "numbers": draw.get('獎號'),
@@ -182,7 +182,7 @@ class MultiLotteryCrawler:
     # 4星彩
     def extract_lotto4d(draw):
         return {
-            "game_type": '4星彩'
+            "game_type": '4星彩',
             "period": draw.get('期別'),
             "date": draw.get('開獎日期'),
             "numbers": draw.get('獎號'),
@@ -193,7 +193,7 @@ class MultiLotteryCrawler:
     # 49樂合彩
     def extract_lotto49m6(draw):
         return {
-            "game_type": '49樂合彩'
+            "game_type": '49樂合彩',
             "period": draw.get('期別'),
             "date": draw.get('開獎日期'),
             "numbers": draw.get('獎號'),
