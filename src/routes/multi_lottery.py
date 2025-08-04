@@ -4,7 +4,7 @@
 多樂透遊戲 API 路由
 支援所有樂透遊戲的 API 端點
 """
-
+import logging
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 import traceback
@@ -26,11 +26,15 @@ predictor = MultiLotteryPredictionAlgorithm()
 def get_supported_games():
     """獲取支援的樂透遊戲列表"""
     try:
+        logging.info('Get support game.')
         games = crawler.get_supported_games()
+        logging.info('Get support game completed.')
         game_info = {}
         
         for game in games:
+            logging.info('Get game config.')
             config = crawler.get_game_config(game)
+            logging.info(f'Get {config['name']} config completed.')
             game_info[game] = {
                 'name': config['name'],
                 'number_range': config['number_range'],
