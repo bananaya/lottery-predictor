@@ -247,6 +247,7 @@ class MultiLotteryCrawler:
         start_year = 2004  
         
         config = self.get_game_config(game_type)
+        existing_date = set()
         results = []        
         draw_count = 0
         
@@ -268,12 +269,12 @@ class MultiLotteryCrawler:
                         date_str = draw_date.strftime("%Y/%m/%d")
                     except Exception:
                         continue
-                    if draw_date > now or date_str in existing_dates:
+                    if draw_date > now or date_str in existing_date:
                         continue
                     lottery_data = config['extract_func'](draw, config['name'])
                     if lottery_data:
                         results.append(lottery_data)
-                        existing_dates.add(date_str)
+                        existing_date.add(date_str)
                         draw_count += 1
                     if draw_count >= max_draws:
                         break
