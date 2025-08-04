@@ -77,9 +77,9 @@ class MultiLotteryPredictionAlgorithm:
                 'special_range': None,
                 'weights': {'frequency': 0.25, 'pattern': 0.25, 'trend': 0.25, 'random': 0.25}
             },
-            '38lotto': {
-                'name': '38樂合彩',
-                'number_range': (1, 38),
+            '39lotto': {
+                'name': '39樂合彩',
+                'number_range': (1, 39),
                 'number_count': 5,
                 'special_number': False,
                 'special_range': None,

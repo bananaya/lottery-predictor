@@ -80,7 +80,7 @@ class MultiLotteryGoogleSheetsManager:
             },
             'predictions': {
                 'sheet_name': '預測結果',
-                'headers': ['遊戲類型', '預測日期', '預測方法', '信心度', '參考期數', '號碼1', '號碼2', '號碼3', '號碼4', '號碼5', '號碼6', '特別號'],
+                'headers': ['遊戲類型', '預測日期', '預測方法', '信心度', '參考期數', '號碼', '特別號'],
                 'number_columns': [],
                 'special_column': None
             }
