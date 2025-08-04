@@ -271,7 +271,10 @@ class MultiLotteryCrawler:
                         continue
                     if draw_date > now or date_str in existing_date:
                         continue
-                    lottery_data = config['extract_func'](draw, config['name'])
+                        
+                    extract_func_name = config['extract_func']  # 是一個字串
+                    extract_func = getattr(self.crawler, extract_func_name)  # 取得函數物件                            
+                    lottery_data = extract_func(draw, config['name'])
                     if lottery_data:
                         results.append(lottery_data)
                         existing_date.add(date_str)
