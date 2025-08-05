@@ -358,6 +358,92 @@
                     <input type="text" id="sheetName" placeholder="例如：我的樂透資料" value="樂透資料">
                 </div>
 
+				<!-- 說明指南 -->
+				<div class="control-panel">
+					<h2 style="margin-bottom: 20px;">🧠 預測演算法選擇指南</h2>
+					<table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+						<thead>
+							<tr style="background: #e0e0e0;">
+								<th style="padding: 10px; border: 1px solid #ccc;">演算法</th>
+								<th style="padding: 10px; border: 1px solid #ccc;">適用遊戲</th>
+								<th style="padding: 10px; border: 1px solid #ccc;">原理</th>
+								<th style="padding: 10px; border: 1px solid #ccc;">優點</th>
+								<th style="padding: 10px; border: 1px solid #ccc;">缺點</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td style="padding: 10px; border: 1px solid #ccc;">頻率分析</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">3星彩、4星彩、威力彩特別號</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">統計號碼出現頻率</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">簡單直觀，適用範圍小</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">不考慮號碼間關聯</td>
+							</tr>
+							<tr>
+								<td style="padding: 10px; border: 1px solid #ccc;">模式識別</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">雙贏彩、BINGO BINGO</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">分析號碼之間的模式與趨勢</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">可發現隱藏關係</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">需大量歷史資料</td>
+							</tr>
+							<tr>
+								<td style="padding: 10px; border: 1px solid #ccc;">混合演算法（推薦）</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">所有遊戲</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">綜合多種預測邏輯</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">高準確率與適應性</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">計算複雜</td>
+							</tr>
+							<tr>
+								<td style="padding: 10px; border: 1px solid #ccc;">機器學習</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">今彩539、大樂透、威力彩</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">用 ML 模型預測</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">可處理複雜關聯</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">需大量訓練資料</td>
+							</tr>
+						</tbody>
+					</table>
+
+					<h2 style="margin-bottom: 20px;">📊 信心度設定建議</h2>
+					<table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+						<thead>
+							<tr style="background: #e0e0e0;">
+								<th style="padding: 10px; border: 1px solid #ccc;">信心度範圍</th>
+								<th style="padding: 10px; border: 1px solid #ccc;">適用情況</th>
+								<th style="padding: 10px; border: 1px solid #ccc;">預期結果</th>
+								<th style="padding: 10px; border: 1px solid #ccc;">建議遊戲</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td style="padding: 10px; border: 1px solid #ccc;">85%-95%</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">重要投注、追求穩定</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">預測次數少、準確率高</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">大樂透、威力彩</td>
+							</tr>
+							<tr>
+								<td style="padding: 10px; border: 1px solid #ccc;">70%-84%</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">日常使用、均衡策略</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">適中預測頻率與準確率</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">今彩539、雙贏彩</td>
+							</tr>
+							<tr>
+								<td style="padding: 10px; border: 1px solid #ccc;">50%-69%</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">娛樂性質、多樣嘗試</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">預測次數多、準確率較低</td>
+								<td style="padding: 10px; border: 1px solid #ccc;">3星彩、4星彩</td>
+							</tr>
+						</tbody>
+					</table>
+
+					<h2 style="margin-bottom: 10px;">🔧 參數設定最佳實踐</h2>
+					<p><strong>參考期數建議：</strong>根據遊戲類型與預測方法調整，建議範圍為 <code>20~100</code> 期。數據越多，模型越穩定，但效能開銷也越大。</p>
+					<ul style="margin-left: 20px; margin-top: 10px;">
+						<li><strong>大樂透/威力彩：</strong>建議參考 50-100 期</li>
+						<li><strong>今彩539/雙贏彩：</strong>建議參考 30-80 期</li>
+						<li><strong>3星彩/4星彩：</strong>建議參考 20-50 期</li>
+					</ul>
+				</div>
+
                 <div class="form-group">
                     <label for="periods">參考期數：</label>
                     <input type="number" id="periods" min="5" max="1000" value="20">
