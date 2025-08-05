@@ -88,7 +88,7 @@ class MultiLotteryCrawler:
                 'special_range': None,
                 'is_digit_game': True,
                 'game_key': 'lotto4d',
-                'extract_func': 'extract_4stars'
+                'extract_func': 'extract_lotto4d'
             },
             '49lotto': {
                 'name': '49樂合彩',
