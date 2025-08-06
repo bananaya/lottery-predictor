@@ -43,14 +43,14 @@ class MultiLotteryPredictionAlgorithm:
                 'special_range': None,
                 'weights': {'frequency': 0.35, 'pattern': 0.35, 'trend': 0.15, 'random': 0.15}
             },
-            'lotto1224': {
-                'name': '雙贏彩',
-                'number_range': (1, 24),
-                'number_count': 12,
-                'special_number': False,
-                'special_range': None,
-                'weights': {'frequency': 0.4, 'pattern': 0.3, 'trend': 0.2, 'random': 0.1}
-            },
+            # 'lotto1224': {
+                # 'name': '雙贏彩',
+                # 'number_range': (1, 24),
+                # 'number_count': 12,
+                # 'special_number': False,
+                # 'special_range': None,
+                # 'weights': {'frequency': 0.4, 'pattern': 0.3, 'trend': 0.2, 'random': 0.1}
+            # },
             '3stars': {
                 'name': '3星彩',
                 'number_range': (0, 9),

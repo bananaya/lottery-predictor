@@ -58,16 +58,16 @@ class MultiLotteryCrawler:
                 'game_key': 'daily_cash',
                 'extract_func': 'extract_daily539'
             },
-            'lotto1224': {
-                'name': '雙贏彩',
-                'url': 'https://www.taiwanlottery.com/lotto/lotto1224/history.aspx',
-                'number_range': (1, 24),
-                'number_count': 12,
-                'special_number': False,
-                'special_range': None,
-                'game_key': 'lotto1224',
-                'extract_func': 'extract_lotto1224'
-            },
+            # 'lotto1224': {
+                # 'name': '雙贏彩',
+                # 'url': 'https://www.taiwanlottery.com/lotto/lotto1224/history.aspx',
+                # 'number_range': (1, 24),
+                # 'number_count': 12,
+                # 'special_number': False,
+                # 'special_range': None,
+                # 'game_key': 'lotto1224',
+                # 'extract_func': 'extract_lotto1224'
+            # },
             '3stars': {
                 'name': '3星彩',
                 'url': 'https://www.taiwanlottery.com/lotto/3stars/history.aspx',
