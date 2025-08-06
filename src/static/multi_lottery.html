@@ -784,9 +784,12 @@
                 resultCard.className = "result-card";
 
                 let numbersHtml = prediction.predicted_numbers.map(num => `<div class="number-ball">${num}</div>`).join("");
-                if (prediction.special_number) {
-                    numbersHtml += `<div class="number-ball special-ball">${prediction.special_number}</div>`;
+                if (prediction.predicted_special) {
+                    numbersHtml += `<div class="number-ball special-ball">${prediction.predicted_special}</div>`;
                 }
+
+                // 判斷是否達到最低信心度
+                const metMinConfidence = prediction.confidence >= data.min_confidence;
 
                 resultCard.innerHTML = `
                     <div class="result-title">推薦號碼 #${index + 1}</div>
@@ -800,7 +803,7 @@
                         </div>
                         <div class="info-item">
                             <div class="info-label">是否達到最低信心度</div>
-                            <div class="info-value">${prediction.met_min_confidence ? '是' : '否'}</div>
+                            <div class="info-value">${metMinConfidence ? '是' : '否'}</div>
                         </div>
                         ${prediction.message ? `<div class="info-item" style="grid-column: 1 / -1;"><div class="info-label">訊息</div><div class="info-value">${prediction.message}</div></div>` : ''}
                     </div>

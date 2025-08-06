@@ -209,6 +209,10 @@ def predict_numbers():
         return jsonify({
             'success': True,
             'game_type': game_config['name'],
+            'method': method,
+            'prediction_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'retry_count': attempts,
+            'min_confidence': min_confidence,
             'predictions': response_predictions,
             'total_predictions_generated': len(response_predictions)
         })
