@@ -358,7 +358,18 @@
                     <input type="text" id="sheetName" placeholder="例如：我的樂透資料" value="樂透資料">
                 </div>
 
-				<!-- 說明指南 -->
+                <div class="form-group">
+                    <label for="numPredictions">推薦號碼數量：</label>
+                    <input type="number" id="numPredictions" min="1" value="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="maxRetries">最大重試次數：</label>
+                    <input type="number" id="maxRetries" min="1" max="10000" value="100">
+                </div>
+
+
+
 				<div class="control-panel">
 					<h2 style="margin-bottom: 20px;">🧠 預測演算法選擇指南</h2>
 					<table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
@@ -638,7 +649,9 @@
             const periods = document.getElementById('periods').value;
             const sheetName = document.getElementById('sheetName').value;
             const method = document.getElementById('method').value;
-            const confidence = document.getElementById('confidence').value / 100;
+            const numPredictions = document.getElementById('numPredictions').value;
+            const confidence = document.getElementById('confidence').value;
+            const maxRetries = document.getElementById('maxRetries').value;
             
             if (!gameType) {
                 showError('請先選擇樂透遊戲');
@@ -653,24 +666,26 @@
             showLoading(`正在預測 ${supportedGames[gameType].name} 下一期號碼...`);
             
             try {
-                const response = await fetch('/api/lottery/predict', {
-                    method: 'POST',
+                const response = await fetch("/api/lottery/predict", {
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
                         game_type: gameType,
                         periods: parseInt(periods),
-                        sheet_name: sheetName,
                         method: method,
-                        min_confidence: confidence
-                    })
+                        sheet_name: sheetName,
+                        num_predictions: parseInt(numPredictions),
+                        min_confidence: parseFloat(confidence) / 100,
+                        max_retries: parseInt(maxRetries)
+                    }),
                 });
                 
                 const data = await response.json();
                 
                 if (data.success) {
-                    displayPredictionResult(data);
+                    displayResults(data);
                 } else {
                     showError('預測失敗：' + data.error + 
                              (data.suggestion ? '<br>建議：' + data.suggestion : ''));
@@ -725,48 +740,73 @@
         }
 
         // 顯示預測結果
-        function displayPredictionResult(data) {
-            const gameInfo = supportedGames[document.getElementById('gameType').value];
-            let numbersHtml = '';
-            
-            // 顯示一般號碼
-            data.predicted_numbers.forEach(num => {
-                numbersHtml += `<div class="number-ball">${num}</div>`;
-            });
-            
-            // 顯示特別號（如果有）
-            if (data.predicted_special && gameInfo.special_number) {
-                numbersHtml += `<div class="number-ball special-ball">${data.predicted_special}</div>`;
-            }
-            
-            const resultHtml = `
-                <div class="result-card">
-                    <div class="result-title">🎯 ${data.game_type} 預測結果</div>
+        function displayResults(data) {
+            const resultsSection = document.getElementById("results");
+            resultsSection.innerHTML = "";
+
+            // 顯示總體資訊
+            const summaryCard = document.createElement("div");
+            summaryCard.className = "result-card";
+            summaryCard.innerHTML = `
+                <div class="result-title">📊 預測結果總覽</div>
+                <div class="result-info">
+                    <div class="info-item">
+                        <div class="info-label">遊戲類型</div>
+                        <div class="info-value">${data.game_type}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">預測方法</div>
+                        <div class="info-value">${data.method}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">推薦號碼數量</div>
+                        <div class="info-value">${data.predictions.length} 組</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">預測時間</div>
+                        <div class="info-value">${data.prediction_date}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">重試次數</div>
+                        <div class="info-value">${data.retry_count || 0}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">最低信心度要求</div>
+                        <div class="info-value">${(data.min_confidence * 100).toFixed(0)}%</div>
+                    </div>
+                </div>
+            `;
+            resultsSection.appendChild(summaryCard);
+
+            // 顯示每組預測號碼
+            data.predictions.forEach((prediction, index) => {
+                const resultCard = document.createElement("div");
+                resultCard.className = "result-card";
+
+                let numbersHtml = prediction.predicted_numbers.map(num => `<div class="number-ball">${num}</div>`).join("");
+                if (prediction.special_number) {
+                    numbersHtml += `<div class="number-ball special-ball">${prediction.special_number}</div>`;
+                }
+
+                resultCard.innerHTML = `
+                    <div class="result-title">推薦號碼 #${index + 1}</div>
                     <div class="numbers-display">
                         ${numbersHtml}
                     </div>
                     <div class="result-info">
                         <div class="info-item">
-                            <div class="info-label">預測方法</div>
-                            <div class="info-value">${data.method}</div>
+                            <div class="info-label">預測信心度</div>
+                            <div class="info-value">${(prediction.confidence * 100).toFixed(2)}%</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">信心度</div>
-                            <div class="info-value">${(data.confidence * 100).toFixed(1)}%</div>
+                            <div class="info-label">是否達到最低信心度</div>
+                            <div class="info-value">${prediction.met_min_confidence ? '是' : '否'}</div>
                         </div>
-                        <div class="info-item">
-                            <div class="info-label">參考期數</div>
-                            <div class="info-value">${data.data_count} 期</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">預測時間</div>
-                            <div class="info-value">${data.prediction_date}</div>
-                        </div>
+                        ${prediction.message ? `<div class="info-item" style="grid-column: 1 / -1;"><div class="info-label">訊息</div><div class="info-value">${prediction.message}</div></div>` : ''}
                     </div>
-                </div>
-            `;
-            
-            document.getElementById('results').innerHTML = resultHtml;
+                `;
+                resultsSection.appendChild(resultCard);
+            });
         }
 
         // 顯示歷史資料

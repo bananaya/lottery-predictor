@@ -145,56 +145,72 @@ def predict_numbers():
                 sheets_manager.save_lottery_data(sheet_name, game_type, crawled_data)
                 historical_data = crawled_data
         
-        # 進行預測, 為增加命中率，增加重試機制。
-        attempts = 0 
-        max_attempts = 1000
-        max_confidence = 0
-        while attempts < max_attempts:
-            attempts += 1
-            prediction_result = predictor.predict_numbers(
-                game_type, historical_data, method, min_confidence
-            )
+        num_predictions = data.get("num_predictions", 1)
+        max_retries = data.get("max_retries", 1000)
+
+        all_predictions = []
+        for _ in range(num_predictions):
+            best_prediction_this_round = None
+            max_confidence_this_round = 0
+            attempts = 0
             
-            if prediction_result["confidence"] > max_confidence:
-                max_confidence = prediction_result["confidence"]
+            while attempts < max_retries:
+                attempts += 1
+                prediction_result = predictor.predict_numbers(
+                    game_type, historical_data, method, min_confidence
+                )
                 
-            if prediction_result['meets_confidence']:
-                break
-            
-        # 檢查是否達到信心度要求
-        if attempts == max_attempts:
+                if prediction_result["confidence"] > max_confidence_this_round:
+                    max_confidence_this_round = prediction_result["confidence"]
+                    best_prediction_this_round = prediction_result
+                    
+                if prediction_result["meets_confidence"]:
+                    all_predictions.append(prediction_result)
+                    break
+            else: # If loop completes without breaking (min_confidence not met)
+                if best_prediction_this_round:
+                    all_predictions.append(best_prediction_this_round)
+                
+        if not all_predictions:
             return jsonify({
                 'success': False,
-                'error': f'預測信心度({max_confidence:.2%})未達到要求({min_confidence:.2%})',
-                'suggestion': '建議降低信心度要求或增加歷史資料期數',
-                'actual_confidence': max_confidence,
-                'required_confidence': min_confidence
+                'error': '未能生成任何推薦號碼，請檢查參數或歷史資料。'
             }), 400
-        
+
         # 準備預測結果
         game_config = predictor.get_game_config(game_type)
-        prediction_data = {
-            'game_type': game_config['name'],
-            'prediction_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'method': prediction_result['method'],
-            'confidence': prediction_result['confidence'],
-            'periods_used': prediction_result['data_count'],
-            'predicted_numbers': prediction_result['predicted_numbers'],
-            'predicted_special': prediction_result.get('predicted_special')
-        }
+        predictions_to_save = []
+        for pred in all_predictions:
+            predictions_to_save.append({
+                'game_type': game_config['name'],
+                'prediction_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'method': pred['method'],
+                'confidence': pred['confidence'],
+                'periods_used': pred['data_count'],
+                'predicted_numbers': pred['predicted_numbers'],
+                'predicted_special': pred.get('predicted_special')
+            })
         
         # 儲存預測結果到 Google Sheets
-        sheets_manager.save_prediction_result(sheet_name, game_config['name'], prediction_data)
+        sheets_manager.save_prediction_result(sheet_name, game_config['name'], predictions_to_save)
         
+        # 返回給用戶的結果，如果沒有達到最低信心度，顯示信心度最高的推薦號碼
+        response_predictions = []
+        for pred in all_predictions:
+            response_predictions.append({
+                'predicted_numbers': pred['predicted_numbers'],
+                'predicted_special': pred.get('predicted_special'),
+                'confidence': pred['confidence'],
+                'method': pred['method'],
+                'data_count': pred['data_count'],
+                'prediction_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            })
+
         return jsonify({
             'success': True,
             'game_type': game_config['name'],
-            'predicted_numbers': prediction_result['predicted_numbers'],
-            'predicted_special': prediction_result.get('predicted_special'),
-            'confidence': prediction_result['confidence'],
-            'method': prediction_result['method'],
-            'data_count': prediction_result['data_count'],
-            'prediction_date': prediction_data['prediction_date']
+            'predictions': response_predictions,
+            'total_predictions_generated': len(response_predictions)
         })
         
     except Exception as e:
