@@ -182,12 +182,12 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        .result-card.red-gradient {
-            background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+        .result-card.high-confidence {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
         }
 
-        .result-card.blue-gradient {
-            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        .result-card.low-confidence {
+            background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
         }
 
         .result-title {
@@ -754,7 +754,7 @@
 
             // 顯示總體資訊
             const summaryCard = document.createElement("div");
-            summaryCard.className = `result-card ${data.predictions.every(p => p.confidence >= data.min_confidence) ? 'blue-gradient' : 'red-gradient'}`;
+            summaryCard.className = "result-card";
             summaryCard.innerHTML = `
                 <div class="result-title">📊 預測結果總覽</div>
                 <div class="result-info">
@@ -789,15 +789,17 @@
             // 顯示每組預測號碼
             data.predictions.forEach((prediction, index) => {
                 const resultCard = document.createElement("div");
-                resultCard.className = "result-card";
+                
+                // 判斷是否達到最低信心度
+                const metMinConfidence = prediction.confidence >= data.min_confidence;
+                
+                // 根據信心度設置卡片樣式
+                resultCard.className = metMinConfidence ? "result-card high-confidence" : "result-card low-confidence";
 
                 let numbersHtml = prediction.predicted_numbers.map(num => `<div class="number-ball">${num}</div>`).join("");
                 if (prediction.predicted_special) {
                     numbersHtml += `<div class="number-ball special-ball">${prediction.predicted_special}</div>`;
                 }
-
-                // 判斷是否達到最低信心度
-                const metMinConfidence = prediction.confidence >= data.min_confidence;
 
                 resultCard.innerHTML = `
                     <div class="result-title">推薦號碼 #${index + 1}</div>
