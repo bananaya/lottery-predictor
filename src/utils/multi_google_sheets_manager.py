@@ -232,7 +232,7 @@ class MultiLotteryGoogleSheetsManager:
             for record in all_records[-periods:]:  # 獲取最近的期數
                 numbers = []
                 for col in config['number_columns']:
-                    if col in record and record[col]:
+                    if col in record and record[col] is not None and record[col] != '':
                         try:
                             numbers.append(int(record[col]))
                         except (ValueError, TypeError):

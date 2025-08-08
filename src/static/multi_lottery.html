@@ -182,6 +182,14 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
+        .result-card.red-gradient {
+            background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+        }
+
+        .result-card.blue-gradient {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        }
+
         .result-title {
             font-size: 1.5em;
             margin-bottom: 20px;
@@ -746,7 +754,7 @@
 
             // 顯示總體資訊
             const summaryCard = document.createElement("div");
-            summaryCard.className = "result-card";
+            summaryCard.className = `result-card ${data.predictions.every(p => p.confidence >= data.min_confidence) ? 'blue-gradient' : 'red-gradient'}`;
             summaryCard.innerHTML = `
                 <div class="result-title">📊 預測結果總覽</div>
                 <div class="result-info">

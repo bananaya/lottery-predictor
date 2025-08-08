@@ -497,10 +497,17 @@ class MultiLotteryPredictionAlgorithm:
     def _select_top_digit_numbers(self, config: Dict, scores: Dict) -> List[int]:
         """選擇星彩遊戲的最高評分數字"""
         selected = []
+        available_digits = list(range(config['number_range'][0], config['number_range'][1] + 1))
+        
         for position in range(config['number_count']):
-            # 每個位置選擇評分最高的數字
-            position_scores = {digit: scores.get(digit, 0) 
-                             for digit in range(config['number_range'][0], config['number_range'][1] + 1)}
+            # 為每個位置獨立選擇數字，允許重複但增加多樣性
+            position_scores = {digit: scores.get(digit, 0) for digit in available_digits}
+            
+            # 添加隨機因子以增加多樣性
+            for digit in position_scores:
+                position_scores[digit] += random.uniform(0, 0.1)
+            
+            # 選擇評分最高的數字
             best_digit = max(position_scores.keys(), key=lambda x: position_scores[x])
             selected.append(best_digit)
         
