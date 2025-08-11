@@ -125,7 +125,7 @@ def predict_numbers():
             }), 400
         
         # 驗證預測方法
-        valid_methods = ['frequency', 'pattern', 'hybrid', 'ml']
+        valid_methods = ['frequency', 'pattern', 'hybrid', 'ml', 'advanced_statistical', 'neural_network']
         if method not in valid_methods:
             return jsonify({
                 'success': False,
