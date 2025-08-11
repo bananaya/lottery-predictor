@@ -666,38 +666,7 @@ class MultiLotteryPredictionAlgorithm:
             'data_count': 0,
             'meets_confidence': confidence >= min_confidence
         }
-
-if __name__ == "__main__":
-    # 測試預測演算法
-    predictor = MultiLotteryPredictionAlgorithm()
-    
-    # 模擬歷史資料
-    sample_data = [
-        {'numbers': [8, 16, 26, 34, 38, 41], 'special_number': 48, 'date': '2025-01-01'},
-        {'numbers': [3, 12, 19, 27, 35, 44], 'special_number': 22, 'date': '2025-01-04'},
-        {'numbers': [5, 14, 23, 31, 39, 46], 'special_number': 17, 'date': '2025-01-07'},
-    ]
-    
-    # 測試大樂透預測
-    print("測試大樂透預測...")
-    result = predictor.predict_numbers('lotto649', sample_data, 'hybrid', 0.7)
-    print(f"預測號碼: {result['predicted_numbers']}")
-    print(f"特別號: {result['predicted_special']}")
-    print(f"信心度: {result['confidence']:.2%}")
-    print(f"方法: {result['method']}")
-    
-    # 測試今彩539預測
-    print("\n測試今彩539預測...")
-    sample_539_data = [
-        {'numbers': [8, 16, 26, 34, 38], 'date': '2025-01-01'},
-        {'numbers': [3, 12, 19, 27, 35], 'date': '2025-01-02'},
-    ]
-    result_539 = predictor.predict_numbers('dailycash', sample_539_data, 'frequency', 0.7)
-    print(f"預測號碼: {result_539['predicted_numbers']}")
-    print(f"信心度: {result_539['confidence']:.2%}")
-    print(f"方法: {result_539['method']}")
-
-
+        
     def _advanced_statistical_prediction(self, config: Dict, historical_data: List[Dict], 
                                         min_confidence: float) -> Dict:
         """
@@ -1247,3 +1216,32 @@ if __name__ == "__main__":
         
         return max(0.1, min(0.9, confidence))
 
+if __name__ == "__main__":
+    # 測試預測演算法
+    predictor = MultiLotteryPredictionAlgorithm()
+    
+    # 模擬歷史資料
+    sample_data = [
+        {'numbers': [8, 16, 26, 34, 38, 41], 'special_number': 48, 'date': '2025-01-01'},
+        {'numbers': [3, 12, 19, 27, 35, 44], 'special_number': 22, 'date': '2025-01-04'},
+        {'numbers': [5, 14, 23, 31, 39, 46], 'special_number': 17, 'date': '2025-01-07'},
+    ]
+    
+    # 測試大樂透預測
+    print("測試大樂透預測...")
+    result = predictor.predict_numbers('lotto649', sample_data, 'hybrid', 0.7)
+    print(f"預測號碼: {result['predicted_numbers']}")
+    print(f"特別號: {result['predicted_special']}")
+    print(f"信心度: {result['confidence']:.2%}")
+    print(f"方法: {result['method']}")
+    
+    # 測試今彩539預測
+    print("\n測試今彩539預測...")
+    sample_539_data = [
+        {'numbers': [8, 16, 26, 34, 38], 'date': '2025-01-01'},
+        {'numbers': [3, 12, 19, 27, 35], 'date': '2025-01-02'},
+    ]
+    result_539 = predictor.predict_numbers('dailycash', sample_539_data, 'frequency', 0.7)
+    print(f"預測號碼: {result_539['predicted_numbers']}")
+    print(f"信心度: {result_539['confidence']:.2%}")
+    print(f"方法: {result_539['method']}")
