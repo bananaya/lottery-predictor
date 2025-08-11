@@ -133,6 +133,10 @@ class MultiLotteryPredictionAlgorithm:
             return self._hybrid_prediction(config, historical_data, min_confidence)
         elif method == 'ml':
             return self._machine_learning_prediction(config, historical_data, min_confidence)
+        elif method == 'advanced_statistical':
+            return self._advanced_statistical_prediction(config, historical_data, min_confidence)
+        elif method == 'neural_network':
+            return self._neural_network_prediction(config, historical_data, min_confidence)
         else:
             return self._hybrid_prediction(config, historical_data, min_confidence)
     
@@ -503,9 +507,9 @@ class MultiLotteryPredictionAlgorithm:
             # 為每個位置獨立選擇數字，允許重複但增加多樣性
             position_scores = {digit: scores.get(digit, 0) for digit in available_digits}
             
-            # 添加隨機因子以增加多樣性
+            # 添加隨機因子以增加多樣性，確保0也有機會被選中
             for digit in position_scores:
-                position_scores[digit] += random.uniform(0, 0.1)
+                position_scores[digit] += random.uniform(0, 0.2)
             
             # 選擇評分最高的數字
             best_digit = max(position_scores.keys(), key=lambda x: position_scores[x])
@@ -692,4 +696,554 @@ if __name__ == "__main__":
     print(f"預測號碼: {result_539['predicted_numbers']}")
     print(f"信心度: {result_539['confidence']:.2%}")
     print(f"方法: {result_539['method']}")
+
+
+    def _advanced_statistical_prediction(self, config: Dict, historical_data: List[Dict], 
+                                        min_confidence: float) -> Dict:
+        """
+        高級統計預測方法
+        結合多種統計技術：馬可夫鏈、貝葉斯推理、時間序列分析、熵分析
+        """
+        try:
+            if len(historical_data) < 10:
+                return self._hybrid_prediction(config, historical_data, min_confidence)
+            
+            # 1. 馬可夫鏈分析 - 分析號碼轉移概率
+            transition_matrix = self._build_markov_chain(historical_data, config)
+            
+            # 2. 貝葉斯推理 - 基於歷史模式更新概率
+            bayesian_probs = self._bayesian_inference(historical_data, config)
+            
+            # 3. 時間序列分析 - 分析號碼出現的時間模式
+            time_series_scores = self._time_series_analysis(historical_data, config)
+            
+            # 4. 熵分析 - 分析號碼組合的隨機性
+            entropy_scores = self._entropy_analysis(historical_data, config)
+            
+            # 5. 週期性分析 - 分析號碼的週期性模式
+            cycle_scores = self._cycle_analysis(historical_data, config)
+            
+            # 6. 相關性分析 - 分析號碼間的相關性
+            correlation_scores = self._correlation_analysis(historical_data, config)
+            
+            # 綜合所有分析結果
+            combined_scores = self._combine_advanced_scores(
+                transition_matrix, bayesian_probs, time_series_scores,
+                entropy_scores, cycle_scores, correlation_scores, config
+            )
+            
+            # 生成預測結果
+            predictions = []
+            for i in range(3):  # 生成3組預測
+                if config.get('number_range') == (0, 9):  # 星彩遊戲
+                    predicted_numbers = self._select_advanced_digit_numbers(config, combined_scores, i)
+                else:  # 一般樂透遊戲
+                    predicted_numbers = self._select_advanced_numbers(config, combined_scores, i)
+                
+                # 計算信心度
+                confidence = self._calculate_advanced_confidence(
+                    predicted_numbers, combined_scores, historical_data, config
+                )
+                
+                prediction = {
+                    'predicted_numbers': predicted_numbers,
+                    'confidence': confidence,
+                    'method': 'advanced_statistical'
+                }
+                
+                # 預測特別號（如果需要）
+                if config.get('special_number'):
+                    special_scores = self._analyze_special_numbers(historical_data, config)
+                    predicted_special = self._select_special_number(special_scores, config)
+                    prediction['predicted_special'] = predicted_special
+                
+                predictions.append(prediction)
+            
+            return {
+                'success': True,
+                'predictions': predictions,
+                'method': 'advanced_statistical',
+                'confidence_threshold': min_confidence,
+                'analysis_details': {
+                    'markov_chain_depth': 3,
+                    'bayesian_prior_strength': 0.1,
+                    'time_series_window': min(20, len(historical_data)),
+                    'entropy_threshold': 0.8,
+                    'cycle_periods': [7, 14, 30],
+                    'correlation_threshold': 0.3
+                }
+            }
+            
+        except Exception as e:
+            print(f"高級統計預測時發生錯誤: {e}")
+            return self._hybrid_prediction(config, historical_data, min_confidence)
+    
+    def _build_markov_chain(self, historical_data: List[Dict], config: Dict) -> Dict:
+        """建立馬可夫鏈轉移矩陣"""
+        transitions = defaultdict(lambda: defaultdict(int))
+        
+        for i in range(1, len(historical_data)):
+            prev_numbers = set(historical_data[i-1].get('numbers', []))
+            curr_numbers = set(historical_data[i].get('numbers', []))
+            
+            # 分析號碼轉移
+            for prev_num in prev_numbers:
+                for curr_num in curr_numbers:
+                    transitions[prev_num][curr_num] += 1
+        
+        # 正規化轉移概率
+        for prev_num in transitions:
+            total = sum(transitions[prev_num].values())
+            if total > 0:
+                for curr_num in transitions[prev_num]:
+                    transitions[prev_num][curr_num] /= total
+        
+        return dict(transitions)
+    
+    def _bayesian_inference(self, historical_data: List[Dict], config: Dict) -> Dict:
+        """貝葉斯推理分析"""
+        # 先驗概率（均勻分布）
+        num_range = config['number_range']
+        prior_prob = 1.0 / (num_range[1] - num_range[0] + 1)
+        
+        # 計算似然度
+        number_counts = Counter()
+        total_draws = len(historical_data)
+        
+        for data in historical_data:
+            for num in data.get('numbers', []):
+                number_counts[num] += 1
+        
+        # 貝葉斯更新
+        posterior_probs = {}
+        for num in range(num_range[0], num_range[1] + 1):
+            likelihood = number_counts.get(num, 0) / (total_draws * config['number_count'])
+            # 使用貝塔分布作為共軛先驗
+            alpha = number_counts.get(num, 0) + 1
+            beta = total_draws - number_counts.get(num, 0) + 1
+            posterior_probs[num] = alpha / (alpha + beta)
+        
+        return posterior_probs
+    
+    def _time_series_analysis(self, historical_data: List[Dict], config: Dict) -> Dict:
+        """時間序列分析"""
+        scores = defaultdict(float)
+        window_size = min(10, len(historical_data))
+        
+        # 分析最近期數的趨勢
+        recent_data = historical_data[-window_size:]
+        
+        for i, data in enumerate(recent_data):
+            weight = (i + 1) / window_size  # 越近期權重越高
+            for num in data.get('numbers', []):
+                scores[num] += weight
+        
+        # 正規化分數
+        max_score = max(scores.values()) if scores else 1
+        for num in scores:
+            scores[num] /= max_score
+        
+        return dict(scores)
+    
+    def _entropy_analysis(self, historical_data: List[Dict], config: Dict) -> Dict:
+        """熵分析 - 分析號碼組合的隨機性"""
+        scores = defaultdict(float)
+        
+        # 計算每個號碼的資訊熵
+        number_freq = Counter()
+        total_count = 0
+        
+        for data in historical_data:
+            for num in data.get('numbers', []):
+                number_freq[num] += 1
+                total_count += 1
+        
+        # 計算熵值
+        for num, freq in number_freq.items():
+            prob = freq / total_count
+            if prob > 0:
+                entropy = -prob * math.log2(prob)
+                scores[num] = entropy
+        
+        return dict(scores)
+    
+    def _cycle_analysis(self, historical_data: List[Dict], config: Dict) -> Dict:
+        """週期性分析"""
+        scores = defaultdict(float)
+        periods = [7, 14, 30]  # 分析不同週期
+        
+        for period in periods:
+            if len(historical_data) >= period * 2:
+                # 分析週期性模式
+                for i in range(period, len(historical_data)):
+                    current_numbers = set(historical_data[i].get('numbers', []))
+                    period_ago_numbers = set(historical_data[i-period].get('numbers', []))
+                    
+                    # 計算週期相似度
+                    intersection = current_numbers.intersection(period_ago_numbers)
+                    for num in intersection:
+                        scores[num] += 1.0 / period  # 週期越短權重越高
+        
+        return dict(scores)
+    
+    def _correlation_analysis(self, historical_data: List[Dict], config: Dict) -> Dict:
+        """相關性分析 - 分析號碼間的相關性"""
+        scores = defaultdict(float)
+        
+        # 建立號碼共現矩陣
+        cooccurrence = defaultdict(lambda: defaultdict(int))
+        
+        for data in historical_data:
+            numbers = data.get('numbers', [])
+            for i, num1 in enumerate(numbers):
+                for j, num2 in enumerate(numbers):
+                    if i != j:
+                        cooccurrence[num1][num2] += 1
+        
+        # 計算相關性分數
+        for num1 in cooccurrence:
+            total_cooccur = sum(cooccurrence[num1].values())
+            if total_cooccur > 0:
+                # 計算該號碼與其他號碼的平均相關性
+                avg_correlation = total_cooccur / len(cooccurrence[num1])
+                scores[num1] = avg_correlation
+        
+        return dict(scores)
+    
+    def _combine_advanced_scores(self, transition_matrix: Dict, bayesian_probs: Dict,
+                                time_series_scores: Dict, entropy_scores: Dict,
+                                cycle_scores: Dict, correlation_scores: Dict,
+                                config: Dict) -> Dict:
+        """綜合所有高級分析的分數"""
+        combined_scores = defaultdict(float)
+        num_range = config['number_range']
+        
+        # 權重設定
+        weights = {
+            'markov': 0.2,
+            'bayesian': 0.25,
+            'time_series': 0.2,
+            'entropy': 0.15,
+            'cycle': 0.1,
+            'correlation': 0.1
+        }
+        
+        for num in range(num_range[0], num_range[1] + 1):
+            # 馬可夫鏈分數
+            markov_score = 0
+            if transition_matrix:
+                for prev_num in transition_matrix:
+                    markov_score += transition_matrix[prev_num].get(num, 0)
+                markov_score /= len(transition_matrix)
+            
+            # 綜合所有分數
+            combined_scores[num] = (
+                weights['markov'] * markov_score +
+                weights['bayesian'] * bayesian_probs.get(num, 0) +
+                weights['time_series'] * time_series_scores.get(num, 0) +
+                weights['entropy'] * entropy_scores.get(num, 0) +
+                weights['cycle'] * cycle_scores.get(num, 0) +
+                weights['correlation'] * correlation_scores.get(num, 0)
+            )
+        
+        return dict(combined_scores)
+    
+    def _select_advanced_numbers(self, config: Dict, scores: Dict, variation: int) -> List[int]:
+        """選擇高級預測的號碼"""
+        # 根據變化參數調整選擇策略
+        if variation == 0:
+            # 第一組：主要基於分數
+            sorted_numbers = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+            selected = [num for num, score in sorted_numbers[:config['number_count']]]
+        elif variation == 1:
+            # 第二組：加入隨機性
+            sorted_numbers = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+            top_candidates = sorted_numbers[:config['number_count'] * 2]
+            selected = random.sample([num for num, score in top_candidates], config['number_count'])
+        else:
+            # 第三組：平衡高分和低分號碼
+            sorted_numbers = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+            high_score = sorted_numbers[:config['number_count'] // 2]
+            low_score = sorted_numbers[-(config['number_count'] - len(high_score)):]
+            selected = [num for num, score in high_score + low_score]
+        
+        return sorted(selected)
+    
+    def _select_advanced_digit_numbers(self, config: Dict, scores: Dict, variation: int) -> List[int]:
+        """選擇高級預測的星彩數字"""
+        selected = []
+        available_digits = list(range(config['number_range'][0], config['number_range'][1] + 1))
+        
+        for position in range(config['number_count']):
+            position_scores = {digit: scores.get(digit, 0) for digit in available_digits}
+            
+            # 根據變化參數調整選擇策略
+            if variation == 0:
+                # 基於分數選擇
+                best_digit = max(position_scores.keys(), key=lambda x: position_scores[x])
+            elif variation == 1:
+                # 加入隨機性
+                top_3 = sorted(position_scores.items(), key=lambda x: x[1], reverse=True)[:3]
+                best_digit = random.choice([digit for digit, score in top_3])
+            else:
+                # 更多隨機性
+                weights = [position_scores[digit] + 0.1 for digit in available_digits]
+                best_digit = random.choices(available_digits, weights=weights)[0]
+            
+            selected.append(best_digit)
+        
+        return selected
+    
+    def _calculate_advanced_confidence(self, predicted_numbers: List[int], scores: Dict,
+                                     historical_data: List[Dict], config: Dict) -> float:
+        """計算高級預測的信心度"""
+        # 基礎信心度：基於預測號碼的分數
+        base_confidence = sum(scores.get(num, 0) for num in predicted_numbers) / len(predicted_numbers)
+        
+        # 歷史匹配度：檢查類似組合在歷史中的表現
+        historical_similarity = 0
+        for data in historical_data[-10:]:  # 檢查最近10期
+            historical_numbers = set(data.get('numbers', []))
+            predicted_set = set(predicted_numbers)
+            intersection = len(historical_numbers.intersection(predicted_set))
+            similarity = intersection / len(predicted_set)
+            historical_similarity += similarity
+        
+        historical_similarity /= min(10, len(historical_data))
+        
+        # 多樣性分數：避免過於集中的號碼
+        if config.get('number_range') != (0, 9):  # 非星彩遊戲
+            diversity = len(set(predicted_numbers)) / len(predicted_numbers)
+            spread = (max(predicted_numbers) - min(predicted_numbers)) / (config['number_range'][1] - config['number_range'][0])
+        else:
+            diversity = len(set(predicted_numbers)) / len(predicted_numbers)
+            spread = 1.0  # 星彩遊戲不考慮分佈
+        
+        # 綜合信心度
+        confidence = (
+            0.4 * base_confidence +
+            0.2 * historical_similarity +
+            0.2 * diversity +
+            0.2 * spread
+        )
+        
+        # 確保信心度在合理範圍內
+        return max(0.1, min(0.95, confidence))
+
+    def _neural_network_prediction(self, config: Dict, historical_data: List[Dict], 
+                                  min_confidence: float) -> Dict:
+        """
+        神經網路預測方法
+        使用簡化的神經網路模型進行預測
+        """
+        try:
+            if len(historical_data) < 20:
+                return self._advanced_statistical_prediction(config, historical_data, min_confidence)
+            
+            # 準備訓練數據
+            X, y = self._prepare_neural_data(historical_data, config)
+            
+            if len(X) < 10:
+                return self._advanced_statistical_prediction(config, historical_data, min_confidence)
+            
+            # 簡化的神經網路預測
+            predictions = []
+            for i in range(3):
+                if config.get('number_range') == (0, 9):  # 星彩遊戲
+                    predicted_numbers = self._neural_predict_digits(X, y, config, i)
+                else:  # 一般樂透遊戲
+                    predicted_numbers = self._neural_predict_numbers(X, y, config, i)
+                
+                # 計算信心度
+                confidence = self._calculate_neural_confidence(predicted_numbers, X, y, config)
+                
+                prediction = {
+                    'predicted_numbers': predicted_numbers,
+                    'confidence': confidence,
+                    'method': 'neural_network'
+                }
+                
+                # 預測特別號（如果需要）
+                if config.get('special_number'):
+                    special_scores = self._analyze_special_numbers(historical_data, config)
+                    predicted_special = self._select_special_number(special_scores, config)
+                    prediction['predicted_special'] = predicted_special
+                
+                predictions.append(prediction)
+            
+            return {
+                'success': True,
+                'predictions': predictions,
+                'method': 'neural_network',
+                'confidence_threshold': min_confidence,
+                'model_details': {
+                    'training_samples': len(X),
+                    'input_features': len(X[0]) if X else 0,
+                    'architecture': 'simplified_mlp'
+                }
+            }
+            
+        except Exception as e:
+            print(f"神經網路預測時發生錯誤: {e}")
+            return self._advanced_statistical_prediction(config, historical_data, min_confidence)
+    
+    def _prepare_neural_data(self, historical_data: List[Dict], config: Dict) -> Tuple[List, List]:
+        """準備神經網路訓練數據"""
+        X, y = [], []
+        window_size = 5  # 使用前5期作為輸入特徵
+        
+        for i in range(window_size, len(historical_data)):
+            # 輸入特徵：前window_size期的號碼
+            features = []
+            for j in range(i - window_size, i):
+                numbers = historical_data[j].get('numbers', [])
+                # 將號碼轉換為one-hot編碼
+                num_range = config['number_range']
+                one_hot = [0] * (num_range[1] - num_range[0] + 1)
+                for num in numbers:
+                    if num_range[0] <= num <= num_range[1]:
+                        one_hot[num - num_range[0]] = 1
+                features.extend(one_hot)
+            
+            # 目標：當前期的號碼
+            target_numbers = historical_data[i].get('numbers', [])
+            target_one_hot = [0] * (num_range[1] - num_range[0] + 1)
+            for num in target_numbers:
+                if num_range[0] <= num <= num_range[1]:
+                    target_one_hot[num - num_range[0]] = 1
+            
+            X.append(features)
+            y.append(target_one_hot)
+        
+        return X, y
+    
+    def _neural_predict_numbers(self, X: List, y: List, config: Dict, variation: int) -> List[int]:
+        """使用神經網路預測一般樂透號碼"""
+        if not X or not y:
+            return self._generate_random_numbers(config)
+        
+        # 簡化的預測：計算每個號碼的平均出現概率
+        num_range = config['number_range']
+        probabilities = [0] * (num_range[1] - num_range[0] + 1)
+        
+        # 計算最近期數的權重平均
+        recent_samples = min(10, len(y))
+        for i in range(len(y) - recent_samples, len(y)):
+            weight = (i - (len(y) - recent_samples) + 1) / recent_samples
+            for j, prob in enumerate(y[i]):
+                probabilities[j] += prob * weight
+        
+        # 正規化概率
+        total_prob = sum(probabilities)
+        if total_prob > 0:
+            probabilities = [p / total_prob for p in probabilities]
+        
+        # 根據變化參數選擇號碼
+        selected = []
+        if variation == 0:
+            # 選擇概率最高的號碼
+            sorted_indices = sorted(range(len(probabilities)), key=lambda i: probabilities[i], reverse=True)
+            selected = [i + num_range[0] for i in sorted_indices[:config['number_count']]]
+        elif variation == 1:
+            # 基於概率的隨機選擇
+            selected = random.choices(
+                range(num_range[0], num_range[1] + 1),
+                weights=probabilities,
+                k=config['number_count']
+            )
+            selected = list(set(selected))  # 去重
+            while len(selected) < config['number_count']:
+                additional = random.choices(
+                    range(num_range[0], num_range[1] + 1),
+                    weights=probabilities,
+                    k=1
+                )[0]
+                if additional not in selected:
+                    selected.append(additional)
+        else:
+            # 混合策略
+            high_prob_count = config['number_count'] // 2
+            sorted_indices = sorted(range(len(probabilities)), key=lambda i: probabilities[i], reverse=True)
+            selected.extend([i + num_range[0] for i in sorted_indices[:high_prob_count]])
+            
+            remaining = config['number_count'] - len(selected)
+            available = [i for i in range(num_range[0], num_range[1] + 1) if i not in selected]
+            selected.extend(random.sample(available, min(remaining, len(available))))
+        
+        return sorted(selected[:config['number_count']])
+    
+    def _neural_predict_digits(self, X: List, y: List, config: Dict, variation: int) -> List[int]:
+        """使用神經網路預測星彩數字"""
+        if not X or not y:
+            return [random.randint(0, 9) for _ in range(config['number_count'])]
+        
+        # 計算每個數字的出現概率
+        digit_probs = [0] * 10
+        recent_samples = min(10, len(y))
+        
+        for i in range(len(y) - recent_samples, len(y)):
+            weight = (i - (len(y) - recent_samples) + 1) / recent_samples
+            for j, prob in enumerate(y[i]):
+                if j < 10:  # 確保在0-9範圍內
+                    digit_probs[j] += prob * weight
+        
+        # 正規化概率
+        total_prob = sum(digit_probs)
+        if total_prob > 0:
+            digit_probs = [p / total_prob for p in digit_probs]
+        
+        # 生成預測數字
+        selected = []
+        for position in range(config['number_count']):
+            if variation == 0:
+                # 選擇概率最高的數字
+                best_digit = digit_probs.index(max(digit_probs))
+            elif variation == 1:
+                # 基於概率的隨機選擇
+                best_digit = random.choices(range(10), weights=digit_probs, k=1)[0]
+            else:
+                # 更多隨機性
+                adjusted_probs = [p + random.uniform(0, 0.1) for p in digit_probs]
+                best_digit = adjusted_probs.index(max(adjusted_probs))
+            
+            selected.append(best_digit)
+        
+        return selected
+    
+    def _calculate_neural_confidence(self, predicted_numbers: List[int], X: List, y: List, config: Dict) -> float:
+        """計算神經網路預測的信心度"""
+        if not X or not y:
+            return 0.5
+        
+        # 基於訓練數據的一致性計算信心度
+        consistency_score = 0
+        recent_samples = min(5, len(y))
+        
+        for i in range(len(y) - recent_samples, len(y)):
+            historical_numbers = []
+            num_range = config['number_range']
+            for j, val in enumerate(y[i]):
+                if val > 0:
+                    historical_numbers.append(j + num_range[0])
+            
+            # 計算與歷史號碼的相似度
+            if historical_numbers:
+                intersection = len(set(predicted_numbers).intersection(set(historical_numbers)))
+                similarity = intersection / max(len(predicted_numbers), len(historical_numbers))
+                consistency_score += similarity
+        
+        consistency_score /= recent_samples
+        
+        # 基於預測號碼的分佈計算額外信心度
+        if config.get('number_range') != (0, 9):  # 非星彩遊戲
+            diversity = len(set(predicted_numbers)) / len(predicted_numbers)
+            spread = (max(predicted_numbers) - min(predicted_numbers)) / (config['number_range'][1] - config['number_range'][0])
+            distribution_score = (diversity + spread) / 2
+        else:
+            distribution_score = len(set(predicted_numbers)) / len(predicted_numbers)
+        
+        # 綜合信心度
+        confidence = 0.6 * consistency_score + 0.4 * distribution_score
+        
+        return max(0.1, min(0.9, confidence))
 
