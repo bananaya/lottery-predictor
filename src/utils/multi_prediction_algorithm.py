@@ -160,27 +160,55 @@ class MultiLotteryPredictionAlgorithm:
             total_draws = len(historical_data)
             number_weights = {}
             
-            for num in range(config['number_range'][0], config['number_range'][1] + 1):
+            # 計算每個號碼的平均間隔和標準差
+            number_intervals = defaultdict(list)
+            last_seen = {}
+            for i, data in enumerate(historical_data):
+                numbers = data.get("numbers", [])
+                for num in numbers:
+                    if num in last_seen:
+                        number_intervals[num].append(i - last_seen[num])
+                    last_seen[num] = i
+            
+            for num in range(config["number_range"][0], config["number_range"][1] + 1):
                 freq = number_freq.get(num, 0)
                 # 使用頻率和期望值的差異來計算權重
-                expected_freq = total_draws * config['number_count'] / (config['number_range'][1] - config['number_range'][0] + 1)
+                expected_freq = total_draws * config["number_count"] / (config["number_range"][1] - config["number_range"][0] + 1)
                 weight = (freq + 1) / (expected_freq + 1)  # 平滑處理
+
+                # 考慮號碼的「熱度」和「冷度」
+                # 熱門號碼：近期出現頻率高
+                # 冷門號碼：近期出現頻率低，但長期可能出現
+                # 這裡可以加入更複雜的熱冷判斷邏輯，例如基於移動平均線或指數平滑
+                
+                # 考慮號碼的平均間隔和標準差
+                if number_intervals[num]:
+                    avg_interval = np.mean(number_intervals[num])
+                    std_interval = np.std(number_intervals[num])
+                    # 如果號碼的平均間隔接近總期數/號碼總數，且標準差小，說明其出現規律性強
+                    # 這裡可以根據 avg_interval 和 std_interval 調整 weight
+                    # 簡單示例：規律性越強，權重越高
+                    if std_interval > 0:
+                        weight *= (1 + (avg_interval / (total_draws / (config["number_range"][1] - config["number_range"][0] + 1))) / std_interval)
+                    else:
+                        weight *= 2 # 如果標準差為0，說明每次都出現，給予高權重
+                
                 number_weights[num] = weight
             
             # 選擇號碼
-            if config.get('is_digit_game', False):
+            if config.get("is_digit_game", False):
                 predicted_numbers = self._select_digit_numbers(config, number_weights)
             else:
                 predicted_numbers = self._select_weighted_numbers(config, number_weights)
             
             # 預測特別號
             predicted_special = None
-            if config['special_number']:
+            if config["special_number"]:
                 predicted_special = self._predict_special_number(config, special_freq)
             
             # 計算信心度
             confidence = self._calculate_confidence(config, historical_data, predicted_numbers, 
-                                                  predicted_special, 'frequency')
+                                                  predicted_special, "frequency")
             
             return {
                 'predicted_numbers': predicted_numbers,
@@ -202,36 +230,57 @@ class MultiLotteryPredictionAlgorithm:
             # 分析號碼間的關聯模式
             pair_freq = Counter()
             sequence_patterns = defaultdict(int)
+            odd_even_patterns = defaultdict(int)
+            large_small_patterns = defaultdict(int)
+            consecutive_patterns = defaultdict(int)
             
             for data in historical_data:
-                numbers = sorted(data.get('numbers', []))
+                numbers = sorted(data.get("numbers", []))
                 
                 # 分析號碼對的出現頻率
                 for i in range(len(numbers)):
                     for j in range(i + 1, len(numbers)):
                         pair_freq[(numbers[i], numbers[j])] += 1
                 
-                # 分析序列模式
+                # 分析序列模式 (差值)
                 if len(numbers) >= 2:
                     for i in range(len(numbers) - 1):
                         diff = numbers[i + 1] - numbers[i]
                         sequence_patterns[diff] += 1
-            
+                
+                # 分析奇偶模式
+                odd_count = sum(1 for n in numbers if n % 2 != 0)
+                even_count = len(numbers) - odd_count
+                odd_even_patterns[f"{odd_count}奇{even_count}偶"] += 1
+                
+                # 分析大小模式 (以號碼範圍中點為界)
+                mid_point = (config["number_range"][0] + config["number_range"][1]) / 2
+                large_count = sum(1 for n in numbers if n > mid_point)
+                small_count = len(numbers) - large_count
+                large_small_patterns[f"{large_count}大{small_count}小"] += 1
+
+                # 分析連號模式
+                consecutive_count = 0
+                for i in range(len(numbers) - 1):
+                    if numbers[i+1] == numbers[i] + 1:
+                        consecutive_count += 1
+                consecutive_patterns[consecutive_count] += 1
+
             # 基於模式選擇號碼
-            predicted_numbers = self._select_pattern_numbers(config, pair_freq, sequence_patterns)
+            predicted_numbers = self._select_pattern_numbers(config, pair_freq, sequence_patterns, odd_even_patterns, large_small_patterns, consecutive_patterns)
             
             # 預測特別號
             predicted_special = None
-            if config['special_number']:
+            if config["special_number"]:
                 special_freq = Counter()
                 for data in historical_data:
-                    if 'special_number' in data:
-                        special_freq[data['special_number']] += 1
+                    if "special_number" in data:
+                        special_freq[data["special_number"]] += 1
                 predicted_special = self._predict_special_number(config, special_freq)
             
             # 計算信心度
             confidence = self._calculate_confidence(config, historical_data, predicted_numbers, 
-                                                  predicted_special, 'pattern')
+                                                  predicted_special, "pattern")
             
             return {
                 'predicted_numbers': predicted_numbers,
@@ -666,7 +715,38 @@ class MultiLotteryPredictionAlgorithm:
             'data_count': 0,
             'meets_confidence': confidence >= min_confidence
         }
-        
+
+if __name__ == "__main__":
+    # 測試預測演算法
+    predictor = MultiLotteryPredictionAlgorithm()
+    
+    # 模擬歷史資料
+    sample_data = [
+        {'numbers': [8, 16, 26, 34, 38, 41], 'special_number': 48, 'date': '2025-01-01'},
+        {'numbers': [3, 12, 19, 27, 35, 44], 'special_number': 22, 'date': '2025-01-04'},
+        {'numbers': [5, 14, 23, 31, 39, 46], 'special_number': 17, 'date': '2025-01-07'},
+    ]
+    
+    # 測試大樂透預測
+    print("測試大樂透預測...")
+    result = predictor.predict_numbers('lotto649', sample_data, 'hybrid', 0.7)
+    print(f"預測號碼: {result['predicted_numbers']}")
+    print(f"特別號: {result['predicted_special']}")
+    print(f"信心度: {result['confidence']:.2%}")
+    print(f"方法: {result['method']}")
+    
+    # 測試今彩539預測
+    print("\n測試今彩539預測...")
+    sample_539_data = [
+        {'numbers': [8, 16, 26, 34, 38], 'date': '2025-01-01'},
+        {'numbers': [3, 12, 19, 27, 35], 'date': '2025-01-02'},
+    ]
+    result_539 = predictor.predict_numbers('dailycash', sample_539_data, 'frequency', 0.7)
+    print(f"預測號碼: {result_539['predicted_numbers']}")
+    print(f"信心度: {result_539['confidence']:.2%}")
+    print(f"方法: {result_539['method']}")
+
+
     def _advanced_statistical_prediction(self, config: Dict, historical_data: List[Dict], 
                                         min_confidence: float) -> Dict:
         """
@@ -1216,32 +1296,3 @@ class MultiLotteryPredictionAlgorithm:
         
         return max(0.1, min(0.9, confidence))
 
-if __name__ == "__main__":
-    # 測試預測演算法
-    predictor = MultiLotteryPredictionAlgorithm()
-    
-    # 模擬歷史資料
-    sample_data = [
-        {'numbers': [8, 16, 26, 34, 38, 41], 'special_number': 48, 'date': '2025-01-01'},
-        {'numbers': [3, 12, 19, 27, 35, 44], 'special_number': 22, 'date': '2025-01-04'},
-        {'numbers': [5, 14, 23, 31, 39, 46], 'special_number': 17, 'date': '2025-01-07'},
-    ]
-    
-    # 測試大樂透預測
-    print("測試大樂透預測...")
-    result = predictor.predict_numbers('lotto649', sample_data, 'hybrid', 0.7)
-    print(f"預測號碼: {result['predicted_numbers']}")
-    print(f"特別號: {result['predicted_special']}")
-    print(f"信心度: {result['confidence']:.2%}")
-    print(f"方法: {result['method']}")
-    
-    # 測試今彩539預測
-    print("\n測試今彩539預測...")
-    sample_539_data = [
-        {'numbers': [8, 16, 26, 34, 38], 'date': '2025-01-01'},
-        {'numbers': [3, 12, 19, 27, 35], 'date': '2025-01-02'},
-    ]
-    result_539 = predictor.predict_numbers('dailycash', sample_539_data, 'frequency', 0.7)
-    print(f"預測號碼: {result_539['predicted_numbers']}")
-    print(f"信心度: {result_539['confidence']:.2%}")
-    print(f"方法: {result_539['method']}")

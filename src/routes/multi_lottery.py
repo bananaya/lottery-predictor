@@ -12,7 +12,7 @@ import traceback
 # 導入多樂透遊戲模組
 from ..utils.multi_lottery_crawler import MultiLotteryCrawler
 from ..utils.multi_google_sheets_manager import MultiLotteryGoogleSheetsManager
-from ..utils.multi_prediction_algorithm import MultiLotteryPredictionAlgorithm
+from ..utils.multi_prediction_algorithm_enhanced import EnhancedMultiLotteryPredictionAlgorithm
 
 # 設定 logging 格式
 logging.basicConfig(
@@ -26,7 +26,7 @@ multi_lottery_bp = Blueprint('lottery', __name__)
 # 初始化模組
 crawler = MultiLotteryCrawler()
 sheets_manager = MultiLotteryGoogleSheetsManager()
-predictor = MultiLotteryPredictionAlgorithm()
+predictor = EnhancedMultiLotteryPredictionAlgorithm()
 
 @multi_lottery_bp.route('/games', methods=['GET'])
 def get_supported_games():
