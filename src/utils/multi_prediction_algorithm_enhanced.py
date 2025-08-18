@@ -13,6 +13,88 @@ from datetime import datetime
 import math
 
 class EnhancedMultiLotteryPredictionAlgorithm:
+    def __init__(self):
+        """初始化預測演算法"""
+        # 樂透遊戲配置
+        self.game_configs = {
+            'lotto649': {
+                'name': '大樂透',
+                'number_range': (1, 49),
+                'number_count': 6,
+                'special_number': True,
+                'special_range': (1, 49),
+                'weights': {'frequency': 0.25, 'pattern': 0.25, 'trend': 0.15, 'random': 0.1, 'advanced_statistical': 0.15, 'neural_network': 0.1}
+            },
+            'superlotto638': {
+                'name': '威力彩',
+                'number_range': (1, 38),
+                'number_count': 6,
+                'special_number': True,
+                'special_range': (1, 8),
+                'weights': {'frequency': 0.25, 'pattern': 0.25, 'trend': 0.15, 'random': 0.1, 'advanced_statistical': 0.15, 'neural_network': 0.1}
+            },
+            'dailycash': {
+                'name': '今彩539',
+                'number_range': (1, 39),
+                'number_count': 5,
+                'special_number': False,
+                'special_range': None,
+                'weights': {'frequency': 0.3, 'pattern': 0.3, 'trend': 0.1, 'random': 0.1, 'advanced_statistical': 0.15, 'neural_network': 0.05}
+            },
+            '3stars': {
+                'name': '3星彩',
+                'number_range': (0, 9),
+                'number_count': 3,
+                'special_number': False,
+                'special_range': None,
+                'is_digit_game': True,
+                'weights': {'frequency': 0.35, 'pattern': 0.25, 'trend': 0.15, 'random': 0.1, 'advanced_statistical': 0.1, 'neural_network': 0.05}
+            },
+            '4stars': {
+                'name': '4星彩',
+                'number_range': (0, 9),
+                'number_count': 4,
+                'special_number': False,
+                'special_range': None,
+                'is_digit_game': True,
+                'weights': {'frequency': 0.35, 'pattern': 0.25, 'trend': 0.15, 'random': 0.1, 'advanced_statistical': 0.1, 'neural_network': 0.05}
+            },
+            'bingobingo': {
+                'name': 'BINGO BINGO 賓果賓果',
+                'number_range': (1, 80),
+                'number_count': 20,
+                'special_number': False,
+                'special_range': None,
+                'weights': {'frequency': 0.2, 'pattern': 0.2, 'trend': 0.2, 'random': 0.2, 'advanced_statistical': 0.1, 'neural_network': 0.1}
+            },
+            '39lotto': {
+                'name': '39樂合彩',
+                'number_range': (1, 39),
+                'number_count': 5,
+                'special_number': False,
+                'special_range': None,
+                'weights': {'frequency': 0.3, 'pattern': 0.3, 'trend': 0.1, 'random': 0.1, 'advanced_statistical': 0.15, 'neural_network': 0.05}
+            },
+            '49lotto': {
+                'name': '49樂合彩',
+                'number_range': (1, 49),
+                'number_count': 6,
+                'special_number': False,
+                'special_range': None,
+                'weights': {'frequency': 0.25, 'pattern': 0.25, 'trend': 0.15, 'random': 0.1, 'advanced_statistical': 0.15, 'neural_network': 0.1}
+            }
+        }    
+        
+    def get_game_config(self, game_type: str) -> Dict:
+        """獲取遊戲配置"""
+        if game_type not in self.game_configs:
+            raise ValueError(f"不支援的遊戲類型: {game_type}")
+        return self.game_configs[game_type]
+    
+    def get_supported_games(self) -> List[str]:
+        """獲取支援的遊戲列表"""
+        return list(self.game_configs.keys())
+    
     """增強版多樂透遊戲預測演算法類別"""
     def _enhanced_frequency_analysis(self, config: Dict, historical_data: List[Dict], 
                                    min_confidence: float) -> Dict:
@@ -824,76 +906,4 @@ class EnhancedMultiLotteryPredictionAlgorithm:
             'method': '隨機預測',
             'data_count': 0,
             'meets_confidence': 0.5 >= min_confidence
-        }
-
-    def __init__(self):
-        """初始化預測演算法"""
-        # 樂透遊戲配置
-        self.game_configs = {
-            'lotto649': {
-                'name': '大樂透',
-                'number_range': (1, 49),
-                'number_count': 6,
-                'special_number': True,
-                'special_range': (1, 49),
-                'weights': {'frequency': 0.25, 'pattern': 0.25, 'trend': 0.15, 'random': 0.1, 'advanced_statistical': 0.15, 'neural_network': 0.1}
-            },
-            'superlotto638': {
-                'name': '威力彩',
-                'number_range': (1, 38),
-                'number_count': 6,
-                'special_number': True,
-                'special_range': (1, 8),
-                'weights': {'frequency': 0.25, 'pattern': 0.25, 'trend': 0.15, 'random': 0.1, 'advanced_statistical': 0.15, 'neural_network': 0.1}
-            },
-            'dailycash': {
-                'name': '今彩539',
-                'number_range': (1, 39),
-                'number_count': 5,
-                'special_number': False,
-                'special_range': None,
-                'weights': {'frequency': 0.3, 'pattern': 0.3, 'trend': 0.1, 'random': 0.1, 'advanced_statistical': 0.15, 'neural_network': 0.05}
-            },
-            '3stars': {
-                'name': '3星彩',
-                'number_range': (0, 9),
-                'number_count': 3,
-                'special_number': False,
-                'special_range': None,
-                'is_digit_game': True,
-                'weights': {'frequency': 0.35, 'pattern': 0.25, 'trend': 0.15, 'random': 0.1, 'advanced_statistical': 0.1, 'neural_network': 0.05}
-            },
-            '4stars': {
-                'name': '4星彩',
-                'number_range': (0, 9),
-                'number_count': 4,
-                'special_number': False,
-                'special_range': None,
-                'is_digit_game': True,
-                'weights': {'frequency': 0.35, 'pattern': 0.25, 'trend': 0.15, 'random': 0.1, 'advanced_statistical': 0.1, 'neural_network': 0.05}
-            },
-            'bingobingo': {
-                'name': 'BINGO BINGO 賓果賓果',
-                'number_range': (1, 80),
-                'number_count': 20,
-                'special_number': False,
-                'special_range': None,
-                'weights': {'frequency': 0.2, 'pattern': 0.2, 'trend': 0.2, 'random': 0.2, 'advanced_statistical': 0.1, 'neural_network': 0.1}
-            },
-            '39lotto': {
-                'name': '39樂合彩',
-                'number_range': (1, 39),
-                'number_count': 5,
-                'special_number': False,
-                'special_range': None,
-                'weights': {'frequency': 0.3, 'pattern': 0.3, 'trend': 0.1, 'random': 0.1, 'advanced_statistical': 0.15, 'neural_network': 0.05}
-            },
-            '49lotto': {
-                'name': '49樂合彩',
-                'number_range': (1, 49),
-                'number_count': 6,
-                'special_number': False,
-                'special_range': None,
-                'weights': {'frequency': 0.25, 'pattern': 0.25, 'trend': 0.15, 'random': 0.1, 'advanced_statistical': 0.15, 'neural_network': 0.1}
-            }
         }
