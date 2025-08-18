@@ -360,7 +360,7 @@ PORT=5000
 ## 📝 更新日誌
 
 ### v4.3 (2025-08-18)
-- 🔧刪除過時的遊戲(BINGO BINGO)，只支援 8 種遊戲。
+- 🔧刪除過時的遊戲(BINGO BINGO) 及無法抓取資料的遊戲 (雙贏彩)，只支援 7 種遊戲。
 - 🧠增加兩種預測演算法
   * 神經網路預測(Neural Network Prediction)
   * 機器學習(Machine Learning)

@@ -14,7 +14,7 @@ import math
 
 class EnhancedMultiLotteryPredictionAlgorithm:
     """增強版多樂透遊戲預測演算法類別"""
-     def _enhanced_frequency_analysis(self, config: Dict, historical_data: List[Dict], 
+    def _enhanced_frequency_analysis(self, config: Dict, historical_data: List[Dict], 
                                    min_confidence: float) -> Dict:
         """增強版頻率分析預測"""
         try:
