@@ -94,6 +94,42 @@ class EnhancedMultiLotteryPredictionAlgorithm:
     def get_supported_games(self) -> List[str]:
         """獲取支援的遊戲列表"""
         return list(self.game_configs.keys())
+        
+    def predict_numbers(self, game_type: str, historical_data: List[Dict], 
+                       method: str = 'hybrid', min_confidence: float = 0.7) -> Dict:
+        """
+        預測樂透號碼
+        
+        Args:
+            game_type: 遊戲類型
+            historical_data: 歷史開獎資料
+            method: 預測方法 (frequency, pattern, hybrid, ml)
+            min_confidence: 最低信心度要求
+            
+        Returns:
+            包含預測結果的字典
+        """
+        config = self.get_game_config(game_type)
+        
+        if not historical_data:
+            return self._generate_random_prediction(config, min_confidence)
+        
+        # 根據方法選擇預測演算法
+        if method == 'frequency':
+            return self._enhanced_frequency_analysis(config, historical_data, min_confidence)
+        elif method == 'pattern':
+            return self._enhanced_pattern_recognition(config, historical_data, min_confidence)
+        elif method == 'hybrid':
+            return self._hybrid_prediction(config, historical_data, min_confidence)
+        elif method == 'ml':
+            return self._machine_learning_prediction(config, historical_data, min_confidence)
+        elif method == 'advanced_statistical':
+            return self._advanced_statistical_prediction(config, historical_data, min_confidence)
+        elif method == 'neural_network':
+            return self._neural_network_prediction(config, historical_data, min_confidence)
+        else:
+            return self._hybrid_prediction(config, historical_data, min_confidence)    
+    
     
     """增強版多樂透遊戲預測演算法類別"""
     def _enhanced_frequency_analysis(self, config: Dict, historical_data: List[Dict], 
@@ -577,6 +613,140 @@ class EnhancedMultiLotteryPredictionAlgorithm:
         except Exception as e:
             print(f"神經網路預測時發生錯誤: {e}")
             return self._advanced_statistical_prediction(config, historical_data, min_confidence)
+
+    def _hybrid_prediction(self, config: Dict, historical_data: List[Dict], 
+                          min_confidence: float) -> Dict:
+        """混合演算法預測"""
+        try:
+            # 獲取多種預測結果
+            freq_result = self._frequency_analysis(config, historical_data, 0.0)
+            pattern_result = self._pattern_recognition(config, historical_data, 0.0)
+            
+            # 合併預測結果
+            weights = config['weights']
+            
+            # 建立號碼評分系統
+            number_scores = defaultdict(float)
+            
+            # 頻率分析權重
+            for num in freq_result['predicted_numbers']:
+                number_scores[num] += weights['frequency']
+            
+            # 模式識別權重
+            for num in pattern_result['predicted_numbers']:
+                number_scores[num] += weights['pattern']
+            
+            # 趨勢分析權重
+            trend_numbers = self._analyze_trends(config, historical_data)
+            for num in trend_numbers:
+                number_scores[num] += weights['trend']
+            
+            # 隨機因子
+            random_numbers = self._generate_random_numbers(config)
+            for num in random_numbers:
+                number_scores[num] += weights['random']
+            
+            # 選擇最高評分的號碼
+            if config.get('is_digit_game', False):
+                predicted_numbers = self._select_top_digit_numbers(config, number_scores)
+            else:
+                predicted_numbers = self._select_top_numbers(config, number_scores)
+            
+            # 預測特別號
+            predicted_special = None
+            if config['special_number']:
+                special_scores = {}
+                if freq_result['predicted_special']:
+                    special_scores[freq_result['predicted_special']] = weights['frequency']
+                if pattern_result['predicted_special']:
+                    special_scores[pattern_result['predicted_special']] = special_scores.get(
+                        pattern_result['predicted_special'], 0) + weights['pattern']
+                
+                if special_scores:
+                    predicted_special = max(special_scores.keys(), key=lambda x: special_scores[x])
+                else:
+                    predicted_special = random.randint(config['special_range'][0], config['special_range'][1])
+            
+            # 計算綜合信心度
+            confidence = (freq_result['confidence'] * weights['frequency'] + 
+                         pattern_result['confidence'] * weights['pattern'] + 
+                         0.6 * weights['trend'] + 0.5 * weights['random'])
+            
+            return {
+                'predicted_numbers': predicted_numbers,
+                'predicted_special': predicted_special,
+                'confidence': confidence,
+                'method': '混合演算法',
+                'data_count': len(historical_data),
+                'meets_confidence': confidence >= min_confidence
+            }
+            
+        except Exception as e:
+            print(f"混合演算法預測時發生錯誤: {e}")
+            return self._generate_random_prediction(config, min_confidence)
+    
+    def _machine_learning_prediction(self, config: Dict, historical_data: List[Dict], 
+                                   min_confidence: float) -> Dict:
+        """機器學習預測（簡化版）"""
+        try:
+            if len(historical_data) < 10:
+                return self._hybrid_prediction(config, historical_data, min_confidence)
+            
+            # 特徵工程
+            features = []
+            targets = []
+            
+            for i in range(len(historical_data) - 1):
+                # 使用前一期的資料作為特徵
+                prev_numbers = historical_data[i]['numbers']
+                next_numbers = historical_data[i + 1]['numbers']
+                
+                # 簡單的特徵：號碼和、奇偶數比例、大小數比例
+                feature = [
+                    sum(prev_numbers),
+                    sum(1 for n in prev_numbers if n % 2 == 1) / len(prev_numbers),  # 奇數比例
+                    sum(1 for n in prev_numbers if n > (config['number_range'][1] + config['number_range'][0]) / 2) / len(prev_numbers)  # 大數比例
+                ]
+                features.append(feature)
+                targets.append(next_numbers)
+            
+            # 簡化的預測（使用最近期數的平均特徵）
+            if len(features) >= 5:
+                recent_features = features[-5:]
+                avg_sum = sum(f[0] for f in recent_features) / len(recent_features)
+                avg_odd_ratio = sum(f[1] for f in recent_features) / len(recent_features)
+                avg_large_ratio = sum(f[2] for f in recent_features) / len(recent_features)
+                
+                # 基於平均特徵生成預測
+                predicted_numbers = self._generate_ml_numbers(config, avg_sum, avg_odd_ratio, avg_large_ratio)
+            else:
+                predicted_numbers = self._generate_random_numbers(config)
+            
+            # 預測特別號
+            predicted_special = None
+            if config['special_number']:
+                special_freq = Counter()
+                for data in historical_data:
+                    if 'special_number' in data:
+                        special_freq[data['special_number']] += 1
+                predicted_special = self._predict_special_number(config, special_freq)
+            
+            # 計算信心度（機器學習的信心度通常較高）
+            confidence = min(0.85, 0.6 + len(historical_data) * 0.01)
+            
+            return {
+                'predicted_numbers': predicted_numbers,
+                'predicted_special': predicted_special,
+                'confidence': confidence,
+                'method': '機器學習',
+                'data_count': len(historical_data),
+                'meets_confidence': confidence >= min_confidence
+            }
+            
+        except Exception as e:
+            print(f"機器學習預測時發生錯誤: {e}")
+            return self._hybrid_prediction(config, historical_data, min_confidence)
+
     
     # 輔助方法
     def _markov_chain_analysis(self, config: Dict, historical_data: List[Dict]) -> Dict:
