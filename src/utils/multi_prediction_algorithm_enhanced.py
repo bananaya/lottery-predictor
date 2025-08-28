@@ -435,10 +435,11 @@ class EnhancedMultiLotteryPredictionAlgorithm:
             # 最終信心度計算
             confidence = base_confidence + data_factor + score_factor + historical_accuracy_factor
             confidence = min(1.0, confidence) # 確保信心度不超過1.0
-            confidence = max(0.0, confidence) # 確保信心度不低於0.0      last_draw_numbers = set(historical_data[-1].get("numbers", []))
-                predicted_set = set(predicted_numbers)
-                common_numbers = len(predicted_set.intersection(last_draw_numbers))
-                similarity_factor = (common_numbers / config["number_count"]) * 0.1 # 相似度對信心度的影響，最多0.1
+            confidence = max(0.0, confidence) # 確保信心度不低於0.0
+            last_draw_numbers = set(historical_data[-1].get("numbers", []))
+            predicted_set = set(predicted_numbers)
+            common_numbers = len(predicted_set.intersection(last_draw_numbers))
+            similarity_factor = (common_numbers / config["number_count"]) * 0.1 # 相似度對信心度的影響，最多0.1
 
             # 最終信心度計算
             confidence = base_confidence + data_factor + method_factor + distribution_factor + similarity_factor
